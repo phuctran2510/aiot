@@ -1074,3 +1074,673 @@ void sendTelegram(String msg) {
     ],
   },
 ]
+
+// ═══ LABS BỔ SUNG ════════════════════════════════════════
+const LABS_EXTRA = [
+  {
+    id:'l11', group:'FPGA', groupColor:'#f472b6',
+    diff:'hard', time:'180 phút', hw:'Tang Nano 9K hoặc Basys 3',
+    title:'Lab 11 — FPGA Blink & Counter với Verilog',
+    obj:'Lập trình FPGA cơ bản: LED blink, 7-segment counter đếm 0-9, pushbutton input.',
+    theory:'FPGA thực thi all logic song song — khác hoàn toàn với MCU tuần tự. "always @(posedge clk)" là paradigm cơ bản của synchronous digital design.',
+    steps:[
+      { t:'Cài IDE', lang:'bash', info:'Tang Nano 9K dùng GOWIN IDE, Basys 3 dùng Vivado',
+        code:`# Tang Nano 9K (GOWIN):
+# Download GOWIN EDA Education từ gowinsemi.com
+# Cài driver: WCH USB-UART
+
+# Basys 3 (Xilinx):
+# Download Vivado ML Standard (miễn phí): xilinx.com
+# Cài khoảng 30GB, chọn "Artix-7" board support
+
+# Cả 2: cài driver, kết nối USB, test với LED blink demo` },
+      { t:'LED Blink cơ bản', lang:'verilog', info:'Tạo file top.v — LED nhấp nháy 1Hz',
+        code:`// Tang Nano 9K: CLK_IN = 27MHz
+// Basys 3: CLK_IN = 100MHz
+module blink #(
+  parameter CLK_HZ = 27_000_000  // Sửa thành 100_000_000 cho Basys3
+)(
+  input  wire clk,
+  input  wire rst_n,   // Active LOW reset
+  output reg  led_n    // Active LOW LED (nhiều FPGA board)
+);
+  // Đủ bit để đếm đến CLK_HZ/2
+  localparam COUNT_MAX = CLK_HZ / 2 - 1;
+  reg [$clog2(COUNT_MAX):0] cnt;
+
+  always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+      cnt   <= 0;
+      led_n <= 1;  // OFF
+    end else if (cnt == COUNT_MAX) begin
+      cnt   <= 0;
+      led_n <= ~led_n;  // Toggle
+    end else
+      cnt <= cnt + 1;
+  end
+endmodule` },
+      { t:'7-Segment Counter', lang:'verilog', info:'Hiển thị số 0-9 tự động đếm 1s/số',
+        code:`module seg_counter (
+  input  wire       clk,
+  output wire [6:0] seg,  // a,b,c,d,e,f,g (active LOW)
+  output wire       dp    // decimal point
+);
+  // BCD to 7-segment decoder
+  function [6:0] bcd2seg;
+    input [3:0] bcd;
+    case (bcd)
+      4'h0: bcd2seg = 7'b1000000; // 0
+      4'h1: bcd2seg = 7'b1111001; // 1
+      4'h2: bcd2seg = 7'b0100100; // 2
+      4'h3: bcd2seg = 7'b0110000; // 3
+      4'h4: bcd2seg = 7'b0011001; // 4
+      4'h5: bcd2seg = 7'b0010010; // 5
+      4'h6: bcd2seg = 7'b0000010; // 6
+      4'h7: bcd2seg = 7'b1111000; // 7
+      4'h8: bcd2seg = 7'b0000000; // 8
+      4'h9: bcd2seg = 7'b0010000; // 9
+      default: bcd2seg = 7'b1111111;
+    endcase
+  endfunction
+
+  reg [26:0] tick;
+  reg [3:0]  digit;
+  
+  always @(posedge clk) begin
+    if (tick == 27_000_000-1) begin  // 1s
+      tick  <= 0;
+      digit <= (digit == 9) ? 0 : digit + 1;
+    end else tick <= tick + 1;
+  end
+
+  assign seg = bcd2seg(digit);
+  assign dp  = 1'b1;  // Off
+endmodule` },
+      { t:'Constraint file (.cst)', lang:'', info:'Gán physical pins cho Tang Nano 9K:',
+        code:`// Tang Nano 9K .cst file
+IO_LOC "clk"   52;  // 27MHz oscillator
+IO_LOC "rst_n" 4;   // S1 button
+IO_LOC "led_n" 10;  // LED0 (active LOW)
+
+// 7-segment: (a=b=c=d=e=f=g=dp → pins cụ thể của board)
+IO_LOC "seg[0]" 25;  // a
+IO_LOC "seg[1]" 26;  // b
+IO_LOC "seg[2]" 27;  // c
+// ... xem schematic của board` },
+    ],
+    tips:['Verilog: <= là non-blocking (dùng trong always @posedge), = là blocking (combinational)','Tang Nano 9K giá ~350K là FPGA board rẻ nhất tốt nhất','Dùng $clog2(N) để tự tính số bit cần thiết'],
+    expect:'LED nhấp nháy 1Hz, 7-segment hiển thị 0→1→2→...→9→0',
+    verify:[
+      {q:'LED blink đúng tần số?', cmd:'Đếm bằng mắt: 1 lần/giây'},
+      {q:'7-seg đếm đúng?', cmd:'Quan sát 0→9 lặp lại'},
+    ],
+  },
+
+  {
+    id:'l12', group:'FPGA', groupColor:'#f472b6',
+    diff:'hard', time:'180 phút', hw:'FPGA board + Python PC',
+    title:'Lab 12 — UART Communication FPGA ↔ PC',
+    obj:'Implement UART Rx/Tx trong Verilog. FPGA nhận lệnh từ PC, xử lý, trả response. Test bằng minicom/PuTTY.',
+    theory:'UART: 1 start bit (LOW) + 8 data bits (LSB first) + 1 stop bit (HIGH). Baud rate phải match cả hai phía. Clock domain crossing cần synchronizer.',
+    steps:[
+      { t:'UART Transmitter', lang:'verilog', info:'',
+        code:`module uart_tx #(
+  parameter CLK_HZ   = 27_000_000,
+  parameter BAUD     = 115200
+)(
+  input       clk, rst_n, tx_start,
+  input [7:0] tx_data,
+  output reg  tx,
+  output reg  tx_busy
+);
+  localparam CLKS_PER_BIT = CLK_HZ / BAUD;  // 234 for 115200
+  localparam IDLE=0, START=1, DATA=2, STOP=3;
+
+  reg [1:0]  state;
+  reg [3:0]  bit_idx;
+  reg [15:0] clk_cnt;
+  reg [7:0]  data_buf;
+
+  always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+      state <= IDLE; tx <= 1; tx_busy <= 0;
+    end else case (state)
+      IDLE: begin
+        tx <= 1;
+        if (tx_start) begin
+          state <= START; data_buf <= tx_data;
+          tx_busy <= 1; clk_cnt <= 0;
+        end
+      end
+      START: begin
+        tx <= 0;  // Start bit
+        if (clk_cnt == CLKS_PER_BIT-1) begin
+          clk_cnt <= 0; bit_idx <= 0; state <= DATA;
+        end else clk_cnt <= clk_cnt + 1;
+      end
+      DATA: begin
+        tx <= data_buf[bit_idx];
+        if (clk_cnt == CLKS_PER_BIT-1) begin
+          clk_cnt <= 0;
+          if (bit_idx == 7) state <= STOP;
+          else bit_idx <= bit_idx + 1;
+        end else clk_cnt <= clk_cnt + 1;
+      end
+      STOP: begin
+        tx <= 1;  // Stop bit
+        if (clk_cnt == CLKS_PER_BIT-1) begin
+          state <= IDLE; tx_busy <= 0; clk_cnt <= 0;
+        end else clk_cnt <= clk_cnt + 1;
+      end
+    endcase
+  end
+endmodule` },
+      { t:'UART Echo Test', lang:'verilog', info:'Nhận byte từ PC và gửi lại (echo)',
+        code:`// Top module: UART loopback
+module uart_echo (
+  input  clk, rst_n, rx,
+  output tx
+);
+  wire [7:0] rx_data;
+  wire       rx_done, tx_busy;
+  reg        tx_start;
+  reg  [7:0] tx_data;
+
+  uart_rx rx_inst(.clk(clk), .rst_n(rst_n), .rx(rx),
+                  .data(rx_data), .done(rx_done));
+  uart_tx tx_inst(.clk(clk), .rst_n(rst_n),
+                  .tx_start(tx_start), .tx_data(tx_data),
+                  .tx(tx), .tx_busy(tx_busy));
+
+  always @(posedge clk) begin
+    tx_start <= 0;
+    if (rx_done && !tx_busy) begin
+      tx_data  <= rx_data + 1;  // Echo +1 (A→B, B→C...)
+      tx_start <= 1;
+    end
+  end
+endmodule` },
+      { t:'Test từ PC', lang:'bash', info:'',
+        code:`# Linux/macOS:
+minicom -b 115200 -D /dev/ttyUSB0
+
+# Windows: PuTTY, Serial, COM3, 115200
+
+# Nhập 'A' → FPGA gửi lại 'B'
+# Nhập 'Z' → FPGA gửi lại '['
+# (vì echo +1 trên ASCII)
+
+# Python test:
+import serial
+s = serial.Serial('/dev/ttyUSB0', 115200)
+s.write(b'Hello')
+print(s.read(5))  # b'Ifmmp'` },
+    ],
+    tips:['115200 baud @ 27MHz: CLKS_PER_BIT = 234 (không hoàn hảo, sai số <0.5%)','Dùng oscilloscope hoặc logic analyzer để debug UART timing','RX cần 2-stage synchronizer tránh metastability'],
+    expect:'PC gửi byte, FPGA echo lại +1, không mất data',
+    verify:[
+      {q:'Echo hoạt động?', cmd:'Gửi "ABC", nhận "BCD"'},
+      {q:'Không mất byte?', cmd:'Gửi 100 bytes, nhận đủ 100'},
+    ],
+  },
+
+  {
+    id:'l13', group:'Nâng cao', groupColor:'#ff6b35',
+    diff:'hard', time:'240 phút', hw:'ESP32 + multiple sensors',
+    title:'Lab 13 — Production-ready AIoT node',
+    obj:'Build ESP32 node theo chuẩn production: WiFiManager, NTP, OTA, Watchdog, SPIFFS config, MQTT TLS, deep sleep, error recovery.',
+    theory:'Production AIoT node phải tự hoạt động không cần can thiệp: tự connect WiFi, tự reconnect MQTT, tự update firmware, tự recover từ crash, monitor heap/stack để phát hiện leak sớm.',
+    steps:[
+      { t:'Cài thư viện', lang:'', info:'Library Manager:',
+        code:`WiFiManager by tzapu → Install
+ArduinoOTA (built-in ESP32 core)
+PubSubClient by Nick O'Leary → Install
+ArduinoJson by Benoit Blanchon → Install
+DHT sensor library by Adafruit → Install` },
+      { t:'Config system với SPIFFS', lang:'cpp', info:'',
+        code:`#include <SPIFFS.h>
+#include <ArduinoJson.h>
+
+struct Config {
+  char mqtt_host[64];
+  int  mqtt_port;
+  char device_id[32];
+  int  send_interval;
+  bool deep_sleep;
+};
+
+Config cfg = { "broker.local", 1883, "esp32-001", 30, false };
+
+void loadConfig() {
+  if (!SPIFFS.begin(true)) return;
+  File f = SPIFFS.open("/config.json", "r");
+  if (!f) { saveConfig(); return; }  // Create default
+  
+  JsonDocument doc;
+  deserializeJson(doc, f);
+  f.close();
+  
+  strlcpy(cfg.mqtt_host, doc["mqtt_host"] | "broker.local", 64);
+  cfg.mqtt_port     = doc["mqtt_port"] | 1883;
+  cfg.send_interval = doc["send_interval"] | 30;
+  strlcpy(cfg.device_id, doc["device_id"] | "esp32-001", 32);
+}
+
+void saveConfig() {
+  JsonDocument doc;
+  doc["mqtt_host"]     = cfg.mqtt_host;
+  doc["mqtt_port"]     = cfg.mqtt_port;
+  doc["device_id"]     = cfg.device_id;
+  doc["send_interval"] = cfg.send_interval;
+  File f = SPIFFS.open("/config.json", "w");
+  serializeJson(doc, f); f.close();
+}` },
+      { t:'Full production main.cpp', lang:'cpp', info:'',
+        code:`#include <WiFiManager.h>
+#include <ArduinoOTA.h>
+#include <PubSubClient.h>
+#include <esp_task_wdt.h>
+#include <time.h>
+#include "config.h"  // Config struct + load/save
+
+// ── Globals ──
+WiFiClient   wifiClient;
+PubSubClient mqtt(wifiClient);
+DHT          dht(4, DHT22);
+bool         wifiReady = false;
+
+// ── Health monitoring ──
+void checkHealth() {
+  size_t freeHeap  = ESP.getFreeHeap();
+  size_t freeStack = uxTaskGetStackHighWaterMark(NULL);
+  
+  if (freeHeap < 20000) {
+    Serial.printf("LOW HEAP: %d bytes!\\n", freeHeap);
+    mqtt.publish("health/warning", "low_heap");
+  }
+  if (freeStack < 512) {
+    Serial.printf("LOW STACK: %d words!\\n", freeStack);
+    mqtt.publish("health/warning", "low_stack");
+  }
+}
+
+// ── MQTT reconnect với backoff ──
+int mqttBackoff = 1000;
+void ensureMQTT() {
+  if (mqtt.connected()) { mqttBackoff = 1000; return; }
+  
+  Serial.printf("MQTT reconnect (backoff %ds)... ", mqttBackoff/1000);
+  if (mqtt.connect(cfg.device_id, nullptr, nullptr,
+                   "status", 1, true, "offline")) {
+    mqtt.publish("status", "online", true);
+    mqtt.subscribe("devices/" + String(cfg.device_id) + "/#");
+    Serial.println("OK");
+    mqttBackoff = 1000;
+  } else {
+    Serial.println("FAIL");
+    delay(mqttBackoff);
+    mqttBackoff = min(mqttBackoff * 2, 60000);  // Max 60s
+  }
+}
+
+void setup() {
+  Serial.begin(115200);
+  esp_task_wdt_init(30, true); // 30s watchdog
+  esp_task_wdt_add(NULL);
+  
+  loadConfig();
+  dht.begin();
+  
+  // WiFiManager: auto-connect hoặc mở AP
+  WiFiManager wm;
+  wm.setConfigPortalTimeout(120);
+  if (!wm.autoConnect("AIoT-Node")) ESP.restart();
+  wifiReady = true;
+  
+  // NTP
+  configTime(7*3600, 0, "pool.ntp.org");
+  
+  // OTA
+  ArduinoOTA.setHostname(cfg.device_id);
+  ArduinoOTA.begin();
+  
+  // MQTT
+  mqtt.setServer(cfg.mqtt_host, cfg.mqtt_port);
+  mqtt.setCallback(onMessage);
+}
+
+unsigned long lastSend = 0, lastHealth = 0;
+void loop() {
+  esp_task_wdt_reset();  // Kick watchdog
+  ArduinoOTA.handle();   // Check OTA
+  
+  if (wifiReady) {
+    ensureMQTT();
+    mqtt.loop();
+  }
+  
+  unsigned long now = millis();
+  
+  // Health check mỗi 60s
+  if (now - lastHealth >= 60000) {
+    lastHealth = now; checkHealth();
+  }
+  
+  // Sensor publish
+  if (now - lastSend >= (unsigned long)cfg.send_interval * 1000) {
+    lastSend = now;
+    
+    float t = dht.readTemperature();
+    float h = dht.readHumidity();
+    if (isnan(t)) { Serial.println("Sensor error!"); return; }
+    
+    // ISO8601 timestamp
+    time_t rawtime; time(&rawtime);
+    char ts[25]; strftime(ts, sizeof(ts), "%Y-%m-%dT%H:%M:%SZ", gmtime(&rawtime));
+    
+    char json[256];
+    snprintf(json, sizeof(json),
+      "{\\"device\\":\\"%s\\",\\"temp\\":%.1f,\\"hum\\":%.1f,\\"ts\\":\\"%s\\","
+      "\\"rssi\\":%d,\\"heap\\":%u,\\"uptime\\":%lu}",
+      cfg.device_id, t, h, ts, WiFi.RSSI(), ESP.getFreeHeap(), millis()/1000);
+    
+    mqtt.publish(("sensors/" + String(cfg.device_id)).c_str(), json);
+  }
+}` },
+    ],
+    tips:['Watchdog: PHẢI gọi esp_task_wdt_reset() ở đầu loop()','MQTT backoff: tránh spam reconnect khi broker down','Health check heap: <20KB cảnh báo, <8KB restart'],
+    expect:'Node tự connect WiFi, tự reconnect MQTT, OTA update được, không crash 24h',
+    verify:[
+      {q:'Tắt WiFi router → ESP32 reconnect khi bật lại?', cmd:'Quan sát Serial log'},
+      {q:'OTA update?', cmd:'Thay đổi firmware version, upload qua WiFi'},
+      {q:'Watchdog recovery?', cmd:'Thêm while(1){} → kiểm tra tự restart sau 30s'},
+    ],
+  },
+
+  {
+    id:'l14', group:'Nâng cao', groupColor:'#ff6b35',
+    diff:'hard', time:'180 phút', hw:'PC + Python',
+    title:'Lab 14 — Train & Deploy TFLite từ đầu (Python → ESP32)',
+    obj:'Toàn bộ pipeline: thu thập data thủ công → feature engineering → train TFLite → convert → deploy. Không dùng Edge Impulse.',
+    theory:'Hiểu pipeline từ đầu giúp debug tốt hơn và tùy chỉnh cho use case đặc biệt. Feature engineering thủ công thường tốt hơn auto-feature cho domain-specific problems.',
+    steps:[
+      { t:'Thu thập data thủ công', lang:'cpp', info:'Upload lên ESP32, mở Serial Plotter:',
+        code:`// Data collector: đọc DHT22 mỗi 100ms, 200 samples/class
+// Class 0: ambient (không làm gì)
+// Class 1: người thở vào sensor (nhiệt tăng, hum tăng)
+// Class 2: phun nước gần sensor (hum tăng nhanh)
+
+#include <DHT.h>
+DHT dht(4, DHT22);
+int count = 0;
+const int CLASS = 0; // Thay 0,1,2 tương ứng từng lần thu
+
+void setup() {
+  Serial.begin(115200);
+  dht.begin();
+  delay(2000);
+  Serial.println("timestamp,temp,hum,class");
+}
+
+void loop() {
+  if (count >= 200) return; // 200 mẫu mỗi class
+  float t = dht.readTemperature();
+  float h = dht.readHumidity();
+  if (!isnan(t)) {
+    Serial.printf("%d,%.2f,%.2f,%d\\n", count++, t, h, CLASS);
+  }
+  delay(100);
+}` },
+      { t:'Feature engineering & Train (Python)', lang:'python', info:'Chạy trên Google Colab hoặc máy tính:',
+        code:`import numpy as np
+import pandas as pd
+import tensorflow as tf
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelEncoder
+
+# Load data từ 3 class (cat thủ công từ Serial output)
+df = pd.read_csv('all_data.csv')
+print(df['class'].value_counts())
+
+# Feature engineering: sliding window của 10 samples
+WINDOW = 10
+def make_windows(df, window=WINDOW):
+    X, y = [], []
+    for i in range(len(df) - window):
+        w = df.iloc[i:i+window]
+        # Statistical features per window
+        feats = [
+            w['temp'].mean(), w['temp'].std(), w['temp'].max() - w['temp'].min(),
+            w['hum'].mean(),  w['hum'].std(),  w['hum'].max() - w['hum'].min(),
+            # Rate of change
+            (w['temp'].iloc[-1] - w['temp'].iloc[0]) / window,
+            (w['hum'].iloc[-1] - w['hum'].iloc[0]) / window,
+        ]
+        X.append(feats); y.append(df.iloc[i+window]['class'])
+    return np.array(X), np.array(y)
+
+X, y = make_windows(df)
+X_tr, X_te, y_tr, y_te = train_test_split(X, y, test_size=0.2)
+
+# Normalize
+mean, std = X_tr.mean(0), X_tr.std(0)
+X_tr_n = (X_tr - mean) / (std + 1e-8)
+X_te_n = (X_te - mean) / (std + 1e-8)
+
+# Model
+model = tf.keras.Sequential([
+    tf.keras.layers.Input(shape=(8,)),
+    tf.keras.layers.Dense(16, activation='relu'),
+    tf.keras.layers.Dropout(0.2),
+    tf.keras.layers.Dense(8,  activation='relu'),
+    tf.keras.layers.Dense(3,  activation='softmax'),
+])
+model.compile('adam', 'sparse_categorical_crossentropy', ['accuracy'])
+model.fit(X_tr_n, y_tr, 100, 32, validation_data=(X_te_n, y_te))
+
+# Convert TFLite INT8
+cvt = tf.lite.TFLiteConverter.from_keras_model(model)
+cvt.optimizations = [tf.lite.Optimize.DEFAULT]
+tflite_model = cvt.convert()
+
+# In norm params để dùng trên ESP32
+print("MEAN =", list(np.round(mean, 4)))
+print("STD  =", list(np.round(std,  4)))
+print(f"Model: {len(tflite_model)} bytes")
+
+# Tạo C header
+hex_data = ', '.join(f'0x{b:02x}' for b in tflite_model)
+with open('model.h', 'w') as f:
+    f.write(f'unsigned char model_data[] = {{{hex_data}}}; ')
+    f.write(f'unsigned int model_len = {len(tflite_model)};')` },
+      { t:'Inference trên ESP32', lang:'cpp', info:'Sau khi copy model.h vào project:',
+        code:`#include <TensorFlowLite_ESP32.h>
+#include "model.h"
+#include "tensorflow/lite/micro/all_ops_resolver.h"
+#include "tensorflow/lite/micro/micro_interpreter.h"
+
+// Paste từ Python output:
+const float MEAN[] = {25.1, 0.3, 0.8, 62.4, 1.2, 2.1, 0.01, 0.05};
+const float STD[]  = { 1.2, 0.4, 1.1,  4.3, 0.8, 1.5, 0.05, 0.12};
+
+const char* LABELS[] = {"ambient", "breath", "water_spray"};
+
+const int ARENA_SIZE = 8192;
+uint8_t arena[ARENA_SIZE];
+tflite::MicroInterpreter* interp;
+DHT dht(4, DHT22);
+
+float window[10][2];  // [time][temp, hum]
+int winIdx = 0;
+
+float extractFeature(int feat_idx) {
+  float vals[10];
+  for(int i=0;i<10;i++) vals[i] = window[i][feat_idx < 3 ? 0 : 1];
+  int fi = feat_idx % 3;
+  float mn=0, mn2=0, mx=-999, mi=999;
+  for(int i=0;i<10;i++){mn+=vals[i];if(vals[i]>mx)mx=vals[i];if(vals[i]<mi)mi=vals[i];}
+  mn/=10;
+  if(fi==0) return mn;
+  if(fi==1){for(int i=0;i<10;i++){float d=vals[i]-mn;mn2+=d*d;}return sqrt(mn2/10);}
+  return mx - mi; // range
+}
+
+void loop() {
+  float t=dht.readTemperature(), h=dht.readHumidity();
+  if(isnan(t)) return;
+  window[winIdx][0]=t; window[winIdx][1]=h;
+  winIdx=(winIdx+1)%10;
+  
+  // Extract 8 features
+  TfLiteTensor* in = interp->input(0);
+  float feats[8];
+  for(int i=0;i<6;i++) feats[i] = (extractFeature(i)-MEAN[i])/(STD[i]+1e-8f);
+  // rate of change
+  feats[6]=(window[(winIdx+9)%10][0]-window[winIdx][0])/10;
+  feats[7]=(window[(winIdx+9)%10][1]-window[winIdx][1])/10;
+  for(int i=6;i<8;i++) feats[i]=(feats[i]-MEAN[i])/(STD[i]+1e-8f);
+  for(int i=0;i<8;i++) in->data.f[i] = feats[i];
+  
+  interp->Invoke();
+  TfLiteTensor* out = interp->output(0);
+  
+  int best=0;
+  for(int i=1;i<3;i++) if(out->data.f[i]>out->data.f[best]) best=i;
+  Serial.printf("[%s] %.1fC %.1f%%  Pred: %s (%.0f%%)\\n",
+    labels[best], t, h, LABELS[best], out->data.f[best]*100);
+  delay(100);
+}` },
+    ],
+    tips:['Sliding window giúp capture dynamics (rate of change) — quan trọng hơn static values','Thu thập ít nhất 30 mẫu mỗi class để tránh overfitting','Debug: in feature values trước khi normalize để phát hiện encoding lỗi'],
+    expect:'Phân biệt được 3 trạng thái môi trường với accuracy >85%',
+    verify:[
+      {q:'Python accuracy > 85%?', cmd:'Training log: val_accuracy'},
+      {q:'ESP32 inference đúng?', cmd:'Thử từng scenario: không làm gì / thở vào / phun nước'},
+    ],
+  },
+
+  {
+    id:'l15', group:'Nâng cao', groupColor:'#ff6b35',
+    diff:'hard', time:'360 phút', hw:'2+ ESP32 + Cloud',
+    title:'Lab 15 — Federated Learning đơn giản với 3 ESP32',
+    obj:'Implement Federated Learning miniature: 3 ESP32 train local model trên data khác nhau, gửi weights về aggregation server (Python), server average weights, broadcast model mới.',
+    theory:'Federated Learning: mỗi device train local → gửi gradient/weights → server FedAvg → broadcast global model. Data KHÔNG rời thiết bị. Privacy-preserving bằng design.',
+    steps:[
+      { t:'Scenario setup', lang:'', info:'',
+        code:`3 ESP32 nodes:
+  Node 1: phòng lạnh (temp 18-22°C) — 200 training samples
+  Node 2: phòng thường (22-28°C)     — 200 training samples
+  Node 3: phòng nóng (28-35°C)       — 200 training samples
+
+Mỗi node train model: classify temp range của phòng mình
+Global model: classify cả 3 phòng chính xác
+
+Round FL:
+  1. Server → broadcast initial model (random weights)
+  2. ESP32[i] → fine-tune local trên data của mình (5 epochs)
+  3. ESP32[i] → gửi weights lên server qua MQTT
+  4. Server → FedAvg: global_w = mean(w1, w2, w3)
+  5. Server → broadcast global model
+  6. Lặp lại 10+ rounds` },
+      { t:'ESP32 Local Training (simplified)', lang:'cpp', info:'',
+        code:`// Simplified: neural network weights stored in SPIFFS
+// Training: gradient descent qua 5 epochs
+
+#include <ArduinoJson.h>
+
+// Mini NN: 2 inputs (temp, hum) → 4 hidden → 3 outputs
+float W1[2][4], b1[4];  // Input → hidden
+float W2[4][3], b2[3];  // Hidden → output
+
+float relu(float x)    { return x > 0 ? x : 0; }
+float sigmoid(float x) { return 1.0f / (1.0f + exp(-x)); }
+
+// Forward pass
+void forward(float* in, float* hidden, float* out) {
+  // Layer 1
+  for(int j=0;j<4;j++) {
+    hidden[j] = b1[j];
+    for(int i=0;i<2;i++) hidden[j] += in[i]*W1[i][j];
+    hidden[j] = relu(hidden[j]);
+  }
+  // Layer 2
+  float sum = 0;
+  for(int k=0;k<3;k++) {
+    out[k] = b2[k];
+    for(int j=0;j<4;j++) out[k] += hidden[j]*W2[j][k];
+    out[k] = exp(out[k]);
+    sum += out[k];
+  }
+  for(int k=0;k<3;k++) out[k] /= sum; // Softmax
+}
+
+// Publish weights to server
+void publishWeights() {
+  JsonDocument doc;
+  // Serialize W1, b1, W2, b2 as arrays
+  JsonArray w1_arr = doc.createNestedArray("W1");
+  for(int i=0;i<2;i++) for(int j=0;j<4;j++) w1_arr.add(W1[i][j]);
+  // ... similarly for b1, W2, b2
+  
+  char buf[2048]; serializeJson(doc, buf);
+  mqtt.publish(("fl/weights/" + String(NODE_ID)).c_str(), buf);
+  Serial.println("Weights published for aggregation");
+}` },
+      { t:'Python FedAvg Server', lang:'python', info:'Chạy trên PC/Raspberry Pi:',
+        code:`import paho.mqtt.client as mqtt
+import json, numpy as np
+from collections import defaultdict
+
+broker = "localhost"
+received_weights = {}
+NUM_NODES = 3
+
+def fedavg(weights_list):
+    """FedAveraging: element-wise mean của tất cả weights"""
+    avg = {}
+    for key in weights_list[0].keys():
+        avg[key] = np.mean([np.array(w[key]) for w in weights_list], axis=0).tolist()
+    return avg
+
+def on_message(client, userdata, msg):
+    topic = msg.topic
+    if "fl/weights/" in topic:
+        node_id = topic.split("/")[-1]
+        weights = json.loads(msg.payload)
+        received_weights[node_id] = weights
+        print(f"Received weights from {node_id}: {len(received_weights)}/{NUM_NODES}")
+        
+        if len(received_weights) >= NUM_NODES:
+            # All weights received → FedAvg
+            global_weights = fedavg(list(received_weights.values()))
+            received_weights.clear()
+            
+            # Broadcast to all nodes
+            payload = json.dumps(global_weights)
+            client.publish("fl/global_model", payload)
+            print(f"FedAvg done → broadcast global model ({len(payload)} bytes)")
+
+client = mqtt.Client("fl_server")
+client.on_message = on_message
+client.connect(broker)
+client.subscribe("fl/weights/#")
+client.loop_forever()` },
+    ],
+    tips:['FedAvg đơn giản nhất: arithmetic mean của weights','Trong thực tế: weighted avg theo dataset size của mỗi node','Cải tiến: FedProx (regularization), Secure Aggregation (mã hóa)'],
+    expect:'Sau 10 rounds, global model classify cả 3 phòng tốt hơn từng local model',
+    verify:[
+      {q:'Server nhận đủ 3 weights?', cmd:'Python log: Received 3/3'},
+      {q:'Global model broadcast?', cmd:'ESP32 nhận "fl/global_model" topic'},
+      {q:'Accuracy cải thiện?', cmd:'So sánh local-only vs federated accuracy'},
+    ],
+  },
+]
+
+// Merge LAB_GROUPS and LABS
+export const ALL_LAB_GROUPS = [
+  ...LAB_GROUPS,
+  { id:'FPGA', color:'#f472b6', count:2 },
+  { id:'Nâng cao', color:'#ff6b35', count:5 },
+]
+
+export const ALL_LABS = [...LABS, ...LABS_EXTRA]

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { THEORY } from '../data/theory'
+import { ALL_THEORY as THEORY } from '../data/theory'
 
 function CopyBtn({ code }) {
   const [ok, setOk] = useState(false)
@@ -74,27 +74,27 @@ export default function Theory() {
   const [sc, setSc] = useState(THEORY[0].sections[0])
   const pick = c => { setCh(c); setSc(c.sections[0]); window.scrollTo(0,0) }
 
-  const chIdx = THEORY.indexOf(ch)
+  const chIdx = ALL_THEORY.indexOf(ch)
   const scIdx = ch.sections.indexOf(sc)
 
   const prev = () => {
     if (scIdx > 0) { setSc(ch.sections[scIdx - 1]); window.scrollTo(0,0) }
-    else if (chIdx > 0) { const prev = THEORY[chIdx-1]; setCh(prev); setSc(prev.sections[prev.sections.length-1]); window.scrollTo(0,0) }
+    else if (chIdx > 0) { const prev = ALL_THEORY[chIdx-1]; setCh(prev); setSc(prev.sections[prev.sections.length-1]); window.scrollTo(0,0) }
   }
   const next = () => {
     if (scIdx < ch.sections.length - 1) { setSc(ch.sections[scIdx + 1]); window.scrollTo(0,0) }
-    else if (chIdx < THEORY.length - 1) { const nx = THEORY[chIdx+1]; setCh(nx); setSc(nx.sections[0]); window.scrollTo(0,0) }
+    else if (chIdx < ALL_THEORY.length - 1) { const nx = ALL_THEORY[chIdx+1]; setCh(nx); setSc(nx.sections[0]); window.scrollTo(0,0) }
   }
   const hasPrev = chIdx > 0 || scIdx > 0
-  const hasNext = chIdx < THEORY.length-1 || scIdx < ch.sections.length-1
+  const hasNext = chIdx < ALL_THEORY.length-1 || scIdx < ch.sections.length-1
 
   return (
     <div>
-      <div className="page-hdr"><h1><span className="gt">Lý thuyết AIoT</span></h1><p>{THEORY.length} chương — từ nền tảng đến FPGA và khởi nghiệp</p></div>
+      <div className="page-hdr"><h1><span className="gt">Lý thuyết AIoT</span></h1><p>{ALL_ALL_THEORY.length} chương — từ nền tảng đến FPGA và khởi nghiệp</p></div>
 
       {/* Mobile chapter scroll */}
       <div className="mob" style={{display:'flex',gap:'.3rem',overflowX:'auto',paddingBottom:'.4rem',marginBottom:'.7rem',scrollbarWidth:'none',WebkitOverflowScrolling:'touch'}}>
-        {THEORY.map(c => (
+        {ALL_THEORY.map(c => (
           <button key={c.id} onClick={() => pick(c)}
             style={{padding:'.32rem .65rem',borderRadius:7,flexShrink:0,background:ch.id===c.id?`${c.color}14`:'var(--sur)',border:`1px solid ${ch.id===c.id?c.color+'35':'var(--brd)'}`,color:ch.id===c.id?c.color:'var(--txt3)',cursor:'pointer',fontSize:'.76rem',fontWeight:ch.id===c.id?600:400,whiteSpace:'nowrap'}}>
             {c.title}
@@ -105,7 +105,7 @@ export default function Theory() {
       <div style={{display:'grid',gridTemplateColumns:'185px 1fr',gap:'1.1rem',alignItems:'start'}}>
         {/* Desktop sidebar */}
         <div style={{position:'sticky',top:'1rem'}} className="desk">
-          {THEORY.map(c => (
+          {ALL_THEORY.map(c => (
             <button key={c.id} onClick={() => pick(c)}
               style={{display:'flex',alignItems:'center',gap:'.42rem',width:'100%',padding:'.4rem .6rem',borderRadius:7,marginBottom:2,background:ch.id===c.id?`${c.color}0d`:'transparent',border:`1px solid ${ch.id===c.id?c.color+'28':'transparent'}`,cursor:'pointer',textAlign:'left',transition:'all .12s'}}>
               <div style={{width:7,height:7,borderRadius:'50%',background:c.color,flexShrink:0,opacity:ch.id===c.id?1:.5}}/>

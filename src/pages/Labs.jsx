@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { LABS, LAB_GROUPS } from '../data/labs'
+import { ALL_LABS as LABS, ALL_LAB_GROUPS as LAB_GROUPS } from '../data/labs_all'
 
 function CopyBtn({ code }) {
   const [ok, setOk] = useState(false)

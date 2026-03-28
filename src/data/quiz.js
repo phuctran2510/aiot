@@ -156,3 +156,162 @@ export const QUIZ = [
    opts:['Mã hóa AES','Gaussian noise hiệu chỉnh (calibrated noise) đảm bảo epsilon-delta privacy','Timestamp','Digital signature'],
    ans:1,exp:'DP-SGD (Differentially Private SGD): clip gradient norm (giới hạn ảnh hưởng 1 sample) rồi thêm Gaussian noise được calibrate theo epsilon-delta privacy budget. Đảm bảo không thể suy ra thông tin cụ thể từ gradient gửi lên.'},
 ]
+
+// ═══ QUIZ BỔ SUNG ═══════════════════════════════════════
+export const QUIZ_EXTRA = [
+  // ── CLOUD & DEVOPS ────────────────────────────────────
+  {id:'q31',cat:'Cloud',lv:'easy',
+   q:'Docker Compose trong AIoT dùng để làm gì?',
+   opts:['Lập trình vi điều khiển','Triển khai nhiều services (MQTT broker, database, dashboard) bằng 1 lệnh','Thiết kế PCB','Mô phỏng mạch điện'],
+   ans:1,exp:'Docker Compose định nghĩa nhiều containers trong file YAML. Chạy docker-compose up -d để khởi động toàn bộ TIG Stack (Telegraf/Node-RED + InfluxDB + Grafana + Mosquitto) trong vài phút.'},
+
+  {id:'q32',cat:'Cloud',lv:'easy',
+   q:'AWS IoT Core và ESP32 giao tiếp qua giao thức nào?',
+   opts:['HTTP REST','MQTT over TLS (port 8883)','WebSocket không mã hóa','FTP'],
+   ans:1,exp:'AWS IoT Core hỗ trợ MQTT over TLS (port 8883), MQTT over WebSocket (port 443), HTTP. ESP32 dùng WiFiClientSecure + PubSubClient với certificates từ AWS để authenticate.'},
+
+  {id:'q33',cat:'Cloud',lv:'medium',
+   q:'NVS (Non-Volatile Storage) trên ESP32 dùng để làm gì?',
+   opts:['Lưu code chương trình','Lưu key-value data tồn tại qua reboot (WiFi credentials, calibration)','RAM tốc độ cao','Cache của CPU'],
+   ans:1,exp:'NVS là flash storage cấu trúc key-value. Dữ liệu tồn tại khi tắt nguồn. Dùng để lưu: WiFi SSID/password, sensor calibration, user preferences, device state.'},
+
+  {id:'q34',cat:'Cloud',lv:'medium',
+   q:'Lợi ích của MQTT ACL (Access Control List) là gì?',
+   opts:['Tăng tốc độ truyền','Phân quyền: device chỉ được publish/subscribe topic của mình','Nén dữ liệu','Backup data'],
+   ans:1,exp:'MQTT ACL kiểm soát quyền theo user/client: ESP32-device1 chỉ được pub sensors/device1/# và sub devices/device1/cmd. Ngăn một device đọc data của device khác hoặc inject lệnh giả.'},
+
+  {id:'q35',cat:'Cloud',lv:'hard',
+   q:'AWS IoT Device Shadow dùng để làm gì?',
+   opts:['Backup firmware','Lưu trạng thái reported/desired của device — sync offline hoặc online','Mã hóa data','Load balancing'],
+   ans:1,exp:'Device Shadow = JSON document với hai phần: "reported" (trạng thái thực tế device gửi lên) và "desired" (trạng thái app muốn). Khi device offline, desired được giữ lại và sync khi reconnect.'},
+
+  // ── DSP & SIGNAL PROCESSING ───────────────────────────
+  {id:'q36',cat:'Xử lý tín hiệu',lv:'easy',
+   q:'FFT (Fast Fourier Transform) chuyển đổi tín hiệu từ đâu sang đâu?',
+   opts:['Analog sang Digital','Time-domain sang Frequency-domain','Spatial sang Temporal','Float sang Integer'],
+   ans:1,exp:'FFT chuyển tín hiệu từ time-domain (biên độ theo thời gian) sang frequency-domain (biên độ theo tần số). Ứng dụng: phát hiện tần số rung động lỗi máy móc, trích xuất MFCC features cho speech AI.'},
+
+  {id:'q37',cat:'Xử lý tín hiệu',lv:'easy',
+   q:'Kalman Filter dùng để làm gì trong AIoT?',
+   opts:['Tăng tốc độ sampling','Lọc nhiễu và kết hợp nhiều nguồn sensor để ước lượng tốt hơn','Mã hóa dữ liệu','Giảm tiêu thụ điện'],
+   ans:1,exp:'Kalman Filter là optimal estimator kết hợp model dự đoán (predict step) và sensor measurement (update step). Ví dụ: kết hợp accelerometer (noise nhiều) + gyroscope (drift nhiều) → angle estimate chính xác.'},
+
+  {id:'q38',cat:'Xử lý tín hiệu',lv:'medium',
+   q:'MFCC (Mel-Frequency Cepstral Coefficients) dùng trong ứng dụng nào?',
+   opts:['Đo nhiệt độ','Speech recognition, wake word detection, audio classification','Điều khiển motor','Đo khoảng cách'],
+   ans:1,exp:'MFCC mô phỏng cách tai người xử lý âm thanh. Chuỗi: Pre-emphasis → Framing → FFT → Mel filterbank (log-spaced) → Log → DCT → 13 coefficients. Đây là feature chuẩn cho speech AI trên MCU.'},
+
+  {id:'q39',cat:'Xử lý tín hiệu',lv:'medium',
+   q:'Complementary Filter kết hợp accelerometer và gyroscope như thế nào?',
+   opts:['Lấy trung bình cộng đơn giản','Gyro cho short-term (ALPHA≈0.98), Accelerometer cho long-term correction (1-ALPHA≈0.02)','Chỉ dùng gyroscope','Chỉ dùng accelerometer'],
+   ans:1,exp:'Complementary Filter: angle = α*(angle + gyro*dt) + (1-α)*accel_angle. α=0.98 → 98% tin vào gyro (chính xác ngắn hạn, drift dài hạn) và 2% correction từ accelerometer (drift-free dài hạn, noisy ngắn hạn).'},
+
+  {id:'q40',cat:'Xử lý tín hiệu',lv:'hard',
+   q:'Số samples N trong FFT phải thỏa điều kiện gì?',
+   opts:['Số nguyên bất kỳ','Số chẵn','Lũy thừa của 2 (2^n) để dùng thuật toán Cooley-Tukey','Số nguyên tố'],
+   ans:2,exp:'FFT Cooley-Tukey (phổ biến nhất) yêu cầu N = 2^n (128, 256, 512, 1024...). Nếu N không phải lũy thừa 2, phải dùng zero-padding. ArduinoFFT library yêu cầu N là power-of-2.'},
+
+  // ── DEEP LEARNING ─────────────────────────────────────
+  {id:'q41',cat:'Deep Learning',lv:'easy',
+   q:'Transfer Learning là gì?',
+   opts:['Chuyển model từ Python sang C++','Dùng lại weights pretrained (VD: ImageNet) và fine-tune cho task mới với dataset nhỏ','Copy model từ cloud về device','Chuyển đổi giữa các framework'],
+   ans:1,exp:'Transfer Learning: dùng lại feature extractor đã train trên 14M ảnh ImageNet. Chỉ cần fine-tune classification head với 200-1000 ảnh của task bạn. Tiết kiệm 99% thời gian và data so với train from scratch.'},
+
+  {id:'q42',cat:'Deep Learning',lv:'easy',
+   q:'MobileNetV3 Small phù hợp AIoT vì?',
+   opts:['Accuracy cao nhất','Kích thước nhỏ (~2MB), tốc độ nhanh, thiết kế cho edge devices','Miễn phí license','Hỗ trợ tiếng Việt'],
+   ans:1,exp:'MobileNetV3 Small: ~2.5MB, ~56ms inference trên Raspberry Pi 4. Dùng depthwise separable convolutions giảm FLOPs 8-9x. Accuracy ImageNet ~67.4% — đủ cho nhiều edge AI applications.'},
+
+  {id:'q43',cat:'Deep Learning',lv:'medium',
+   q:'Data Augmentation giải quyết vấn đề gì trong Transfer Learning?',
+   opts:['Tăng tốc training','Giải quyết overfitting khi dataset nhỏ bằng cách tạo variations giả','Giảm model size','Tăng accuracy tuyệt đối'],
+   ans:1,exp:'Dataset nhỏ → model overfit (học thuộc thay vì học pattern). Augmentation tạo variations (flip, rotate, zoom, brightness, contrast) giúp model học được invariances. 200 ảnh + augment ~ hiệu quả của 2000 ảnh.'},
+
+  {id:'q44',cat:'Deep Learning',lv:'medium',
+   q:'Trong Q-Learning, Epsilon (ε) kiểm soát điều gì?',
+   opts:['Learning rate','Exploration vs Exploitation trade-off: ε lớn = khám phá nhiều, ε nhỏ = dùng knowledge hiện tại','Discount factor của future rewards','Kích thước Q-table'],
+   ans:1,exp:'Epsilon-greedy policy: với xác suất ε chọn action ngẫu nhiên (explore), với xác suất 1-ε chọn action tốt nhất từ Q-table (exploit). Epsilon decay theo thời gian: ban đầu explore nhiều, sau khai thác knowledge đã học.'},
+
+  {id:'q45',cat:'Deep Learning',lv:'hard',
+   q:'Attention mechanism trong Multi-modal Fusion hoạt động như thế nào?',
+   opts:['Lấy trung bình tất cả features','Học weight động cho từng modality dựa trên context (self-attention scores)','Ghép nối (concatenate) tất cả features','Chỉ dùng modality có accuracy cao nhất'],
+   ans:1,exp:'Attention: Q (query), K (key), V (value) matrices. Score = softmax(QK^T/√d_k)×V. Model học tự động: khi vibration normal, trust audio more; khi audio normal, trust vibration more. Dynamic weighting based on input.'},
+
+  // ── KIẾN TRÚC HỆ THỐNG ───────────────────────────────
+  {id:'q46',cat:'Kiến trúc',lv:'easy',
+   q:'ESP-NOW khác WiFi MQTT ở điểm nào quan trọng?',
+   opts:['Tốc độ nhanh hơn','P2P trực tiếp giữa các ESP32 không cần router/broker — latency <10ms, offline OK','Range xa hơn','Bảo mật tốt hơn'],
+   ans:1,exp:'ESP-NOW: IEEE 802.11 dataframe trực tiếp ESP32-to-ESP32, không cần WiFi AP hay MQTT broker. Latency <10ms, hoạt động khi không có WiFi, tiêu thụ điện thấp. Phù hợp: sensor mesh network, robot swarm.'},
+
+  {id:'q47',cat:'Kiến trúc',lv:'easy',
+   q:'SPIFFS trên ESP32 dùng để làm gì?',
+   opts:['Tăng tốc RAM','Lưu files (HTML, certificates, JSON config, TFLite model) trong Flash partition','Giao thức mạng','Loại RAM nhanh'],
+   ans:1,exp:'SPIFFS (SPI Flash File System) tạo filesystem trong Flash partition của ESP32. Dùng để lưu: HTML/CSS web server, certificates cho TLS, config JSON, TFLite model file. Mount với SPIFFS.begin().'},
+
+  {id:'q48',cat:'Kiến trúc',lv:'medium',
+   q:'LWT (Last Will Testament) trong MQTT dùng để làm gì?',
+   opts:['Mã hóa messages','Broker gửi message tự động khi client disconnect đột ngột để báo offline','Backup toàn bộ topics','Xác thực user'],
+   ans:1,exp:'LWT: khi connect, client đăng ký 1 topic + message sẽ được broker publish nếu client disconnect bất ngờ (mất điện, crash). Dùng cho: thiết bị gửi "status: offline" khi mất kết nối — không cần heartbeat polling.'},
+
+  {id:'q49',cat:'Kiến trúc',lv:'medium',
+   q:'OEE (Overall Equipment Effectiveness) đo lường gì trong Industrial IoT?',
+   opts:['Nhiệt độ thiết bị','Availability × Performance × Quality — hiệu quả tổng thể dây chuyền sản xuất','Lượng điện tiêu thụ','Tốc độ mạng IoT'],
+   ans:1,exp:'OEE = Availability × Performance × Quality. Availability: thiết bị sẵn sàng bao nhiêu % (downtime). Performance: chạy đúng tốc độ mục tiêu? Quality: % sản phẩm đạt chuẩn. OEE world-class = 85%.'},
+
+  {id:'q50',cat:'Kiến trúc',lv:'hard',
+   q:'Trong hệ thống AIoT production, Watchdog Timer giải quyết vấn đề gì?',
+   opts:['Đồng bộ thời gian','Tự động reset MCU nếu code bị treo/deadlock, đảm bảo uptime cao','Tăng tốc WiFi reconnect','Mã hóa firmware'],
+   ans:1,exp:'Watchdog Timer: hardware timer reset MCU nếu code không gọi esp_task_wdt_reset() trong N giây. Giải quyết: deadlock, infinite loop, stack overflow, WiFi hang. Production device cần WDT để self-recover không cần can thiệp.'},
+
+  // ── THỰC TIỄN & ỨNG DỤNG ─────────────────────────────
+  {id:'q51',cat:'Ứng dụng',lv:'easy',
+   q:'Smart Agriculture (nông nghiệp thông minh) với AIoT tiết kiệm nước như thế nào?',
+   opts:['Tắt nước hoàn toàn','AI kết hợp soil moisture sensor + weather forecast không tưới khi sắp mưa, chỉ tưới khi cần','Dùng ống nước nhỏ hơn','Tưới ban đêm'],
+   ans:1,exp:'AIoT Smart Irrigation: soil sensor đo độ ẩm thực tế + OpenWeatherMap API 48h forecast. Không tưới trước 2 giờ có mưa. Tưới đúng lượng cần. Thực tế: tiết kiệm 40-60% nước so với tưới cố định theo lịch.'},
+
+  {id:'q52',cat:'Ứng dụng',lv:'easy',
+   q:'Ứng dụng AIoT nào phù hợp nhất cho sinh viên Đà Lạt nghiên cứu?',
+   opts:['Autonomous driving car','Smart greenhouse hoa lan/rau sạch — phù hợp địa phương, dataset dễ thu thập','Satellite communication','Quantum computing'],
+   ans:1,exp:'Đà Lạt có lợi thế: nông nghiệp hoa lan, rau sạch, cà phê; khí hậu đặc biệt. Smart Greenhouse AIoT: dễ thu thập data thực tế, có thể pilot test với nông dân địa phương, giá trị kinh tế rõ ràng.'},
+
+  {id:'q53',cat:'Ứng dụng',lv:'medium',
+   q:'Digital Twin trong công nghiệp là gì?',
+   opts:['Bản sao vật lý của máy móc','Mô hình số sync realtime với thiết bị thực — dùng để mô phỏng, dự báo, tối ưu hóa','Phần mềm tạo tài liệu','Hệ thống backup dữ liệu'],
+   ans:1,exp:'Digital Twin = bản sao số của asset vật lý, sync realtime từ IoT sensors. Cho phép: mô phỏng "what-if" (thay đổi tham số và xem kết quả), phát hiện anomaly, dự báo maintenance. Thị trường $73B vào 2027.'},
+
+  {id:'q54',cat:'Ứng dụng',lv:'medium',
+   q:'BEMS (Building Energy Management System) với AIoT giảm chi phí điện bằng cách nào?',
+   opts:['Tắt tất cả thiết bị ban đêm','LSTM forecast nhu cầu điện 24h + Demand Response tắt thiết bị không cần thiết giờ peak tariff','Dùng đèn LED thay thường','Lắp thêm pin mặt trời'],
+   ans:1,exp:'BEMS AIoT: PZEM energy meter thu thập data 20 phòng → LSTM dự báo peak demand → Demand Response tự động tắt thiết bị phụ (máy in, máy lạnh phòng trống) khi giá điện cao. Tiết kiệm 20-30% hóa đơn.'},
+
+  {id:'q55',cat:'Ứng dụng',lv:'hard',
+   q:'Hệ thống Predictive Maintenance AIoT phát hiện hỏng hóc trước bao lâu?',
+   opts:['1 phút','1 giờ','3-30 ngày — đủ để lên kế hoạch bảo trì, tránh unplanned downtime','1 năm'],
+   ans:2,exp:'Predictive Maintenance tốt phát hiện được 3-30 ngày trước khi hỏng. Bearing fault: 2-4 tuần. Motor winding degradation: 1-2 tháng. Đủ thời gian đặt phụ kiện, lên lịch ngừng máy có kế hoạch. Giảm downtime 60%, chi phí maintenance 35%.'},
+
+  {id:'q56',cat:'Ứng dụng',lv:'hard',
+   q:'Trong hệ thống chấm công nhận dạng khuôn mặt, Privacy-by-Design nghĩa là gì?',
+   opts:['Mã hóa file ảnh','Xử lý tại thiết bị (on-device inference), không lưu ảnh, chỉ lưu face embeddings — compliant với GDPR/PDPA','Xóa ảnh sau 30 ngày','Dùng password bảo vệ database'],
+   ans:1,exp:'Privacy-by-Design: ảnh khuôn mặt được inference ngay tại camera (ESP32-CAM), chỉ lưu embedding vector (128 floats, không thể reconstruct ảnh). Không vi phạm quyền riêng tư. Compliant với GDPR Article 25. PDPA Việt Nam sắp có hiệu lực.'},
+
+  // ── PHẦN CỨNG NÂNG CAO ────────────────────────────────
+  {id:'q57',cat:'Phần cứng',lv:'medium',
+   q:'PZEM-004T là gì và dùng để làm gì?',
+   opts:['Cảm biến nhiệt độ cao','Đo lường điện AC: voltage, current, power factor, energy (kWh) — kết nối UART','Module WiFi cho Arduino','Bộ nhớ Flash ngoài'],
+   ans:1,exp:'PZEM-004T: non-invasive AC power meter. Đo: voltage (80-260V AC), current (0-100A với CT clamp), power (W), power factor, frequency, energy (kWh). Giao tiếp UART (Modbus RTU). Dùng trong BEMS, smart meter.'},
+
+  {id:'q58',cat:'Phần cứng',lv:'medium',
+   q:'MAX30105 (MAX30102) cảm biến đo được gì?',
+   opts:['CO2 và VOC','Heart rate (BPM) và SpO2 (%) qua photoplethysmography (PPG) — không cần kim tiêm','Gia tốc và con quay','Áp suất không khí'],
+   ans:1,exp:'MAX30105 là PPG sensor: phát LED đỏ + IR, đo ánh sáng phản chiếu từ mao mạch. Mỗi nhịp tim → peak trong tín hiệu. SpO2: tỷ lệ hấp thụ đỏ/IR. Dùng trong wearable health monitoring, pulse oximeter.'},
+
+  {id:'q59',cat:'Phần cứng',lv:'hard',
+   q:'ESP32-S3 có lợi thế gì so với ESP32 gốc cho AI inference?',
+   opts:['Giá rẻ hơn','Xtensa LX7 + AI/vector extensions (SIMD) tăng tốc TFLite 4.5x, hỗ trợ USB OTG, camera interface tốt hơn','WiFi 5GHz','4 lõi CPU'],
+   ans:1,exp:'ESP32-S3: Xtensa LX7 @240MHz + vector instruction extensions (SIMD cho operations như dot product, multiply-accumulate). Espressif đo được 4.5x faster TFLite inference so với ESP32. Thêm USB OTG native, 45 GPIO, hỗ trợ camera trực tiếp.'},
+
+  {id:'q60',cat:'Phần cứng',lv:'hard',
+   q:'JTAG debugging trên ESP32 cho phép làm gì mà Serial.print() không làm được?',
+   opts:['In ra màn hình đẹp hơn','Breakpoint, step-through code, xem/thay đổi memory/registers realtime mà không cần thêm code','Tăng tốc upload firmware','Đọc sensor từ xa'],
+   ans:1,exp:'JTAG (Joint Test Action Group): hardware debugging interface. Với OpenOCD + GDB: đặt breakpoint, step line-by-line, xem stack trace khi crash, đọc/ghi bất kỳ memory address. Không phải thêm Serial.print() và re-flash. Cần thiết cho production debugging.'},
+]

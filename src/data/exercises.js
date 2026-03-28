@@ -102,3 +102,92 @@ export const EXERCISES = [
    hint:'Test ít nhất 1 tuần liên tục để validate automation logic.',
    expected:'Hệ thống chạy tự động 1 tuần, so sánh lượng nước trước/sau, ảnh chronicle cây lớn'},
 ]
+
+// ═══ BÀI TẬP BỔ SUNG ════════════════════════════════════
+export const EXERCISES_EXTRA = [
+  {id:'e15',cat:'Cơ bản',diff:'easy',time:'45 phút',hw:'ESP32 + Potentiometer + Buzzer',
+   title:'PWM Tone Generator',
+   desc:'Tạo nhạc chuông đơn giản bằng buzzer passive + PWM. Thực hiện giai điệu "Happy Birthday" (8 nốt nhạc). Hiển thị nốt đang phát trên Serial.',
+   steps:['Kết nối buzzer passive vào GPIO25 (DAC channel)','Định nghĩa mảng tần số các nốt: C4=262Hz, D4=294, E4=330, F4=349, G4=392, A4=440, B4=494, C5=523','Dùng ledcWriteTone() để phát từng nốt','Định nghĩa mảng melody + duration cho Happy Birthday','Thêm volume control bằng potentiometer'],
+   hint:'ledcSetup(0, freq, 8); ledcWrite(0, 128); để phát nốt. ledcWrite(0,0) để ngừng.',
+   expected:'Phát được giai điệu nhận ra được, volume thay đổi theo potentiometer'},
+
+  {id:'e16',cat:'Cơ bản',diff:'easy',time:'60 phút',hw:'ESP32 + 4-digit 7-segment',
+   title:'Đồng hồ đếm ngược (countdown timer)',
+   desc:'Đồng hồ đếm ngược dùng màn hình 7-segment 4 chữ số (TM1637). Nút Start/Stop, nút Reset, nút tăng/giảm thời gian. Buzzer kêu khi về 0.',
+   steps:['Cài thư viện TM1637 → kết nối CLK=22, DIO=21','Implement State Machine: IDLE, RUNNING, PAUSED, DONE','Nút Start/Stop: GPIO14, Reset: GPIO27, +1min: GPIO26','Non-blocking countdown dùng millis()','Buzzer 3 lần khi countdown đến 0'],
+   hint:'TM1637.display(minute, second) format phút:giây.',
+   expected:'Đếm ngược đúng, nút phản hồi chính xác, buzzer khi xong'},
+
+  {id:'e17',cat:'Cơ bản',diff:'easy',time:'45 phút',hw:'ESP32 + Rain Sensor + LED',
+   title:'Cảm biến mưa tự động đóng cửa sổ',
+   desc:'Mô phỏng hệ thống đóng cửa sổ tự động khi trời mưa. Rain sensor (analog) → threshold detection → servo motor đóng/mở → LED indicator + buzzer alert.',
+   steps:['Kết nối rain sensor: AO→GPIO34, DO→GPIO35','Đọc analog giá trị độ ẩm mưa (0=ướt, 4095=khô)','Servo motor mô phỏng cửa sổ: 0°=đóng, 90°=mở','Hysteresis: mở khi dry>80%, đóng khi wet<40%','LED xanh=mở, đỏ=đóng; Telegram alert khi trời mưa'],
+   hint:'Hysteresis tránh servo đóng mở liên tục khi ở biên threshold.',
+   expected:'Servo tự động đóng khi đổ nước vào sensor, mở khi khô'},
+
+  {id:'e18',cat:'Trung cấp',diff:'medium',time:'90 phút',hw:'ESP32 + RFID RC522',
+   title:'Hệ thống kiểm soát ra vào bằng RFID',
+   desc:'RFID RC522 đọc thẻ/tag → kiểm tra trong whitelist → mở relay (cửa) nếu được phép → log vào SPIFFS → web admin xem lịch sử, thêm/xóa thẻ.',
+   steps:['Kết nối RC522 (SPI): MOSI=23, MISO=19, SCK=18, SS=5, RST=27','Cài thư viện MFRC522, đọc UID thẻ dạng hex string','Whitelist trong SPIFFS /whitelist.json: [{uid,name,role}]','Relay GPIO26 mở 3 giây khi thẻ hợp lệ','Web API: GET /api/logs, POST /api/whitelist, DELETE /api/whitelist/:uid'],
+   hint:'UID thẻ RFID là unique — dùng làm key trong JSON whitelist.',
+   expected:'Thẻ hợp lệ → relay mở + log; thẻ không hợp lệ → từ chối + log'},
+
+  {id:'e19',cat:'Trung cấp',diff:'medium',time:'120 phút',hw:'ESP32 + SD Card',
+   title:'Offline Data Logger với SD Card',
+   desc:'Logger ghi mọi sensor data vào SD card khi không có WiFi. Khi có WiFi, tự động sync data lên server. Implement circular buffer trên SD tránh đầy dung lượng.',
+   steps:['Kết nối SD card (SPI): MOSI=23, MISO=19, SCK=18, CS=5','Tạo file /data/YYYYMMDD.csv mỗi ngày','Ghi: timestamp,temp,hum,pressure mỗi 30s','Khi WiFi available: read file + POST lên server + delete file','Circular log: xóa file cũ nhất khi SD > 80% full'],
+   hint:'SD.begin(5) với CS=GPIO5. Dùng RTClib hoặc NTP để có timestamp chính xác.',
+   expected:'Ghi data offline, sync tự động khi có WiFi, không bao giờ đầy SD'},
+
+  {id:'e20',cat:'Trung cấp',diff:'medium',time:'150 phút',hw:'ESP32 + 4-channel Relay + PIR',
+   title:'Home Automation với Schedule & Scene',
+   desc:'4 relay điều khiển đèn/quạt với: web dashboard bật/tắt manual, schedule theo giờ, scene (all on/all off/night mode), PIR trigger. Lưu schedule vào SPIFFS.',
+   steps:['4 relay active-LOW vào GPIO26,27,14,12','Web dashboard 4 toggle switches + schedule form','Schedule JSON: [{device,hour,minute,action}]','PIR trigger: bật đèn 5 phút khi có chuyển động ban đêm','Scene buttons: Morning (đèn phòng khách on), Night (tắt hết), Movie (đèn mờ)'],
+   hint:'Dùng NTP để so sánh thời gian với schedule mỗi phút.',
+   expected:'Dashboard điều khiển realtime, schedule chạy đúng giờ, scene hoạt động'},
+
+  {id:'e21',cat:'TinyML',diff:'hard',time:'240 phút',hw:'ESP32 + Camera + MQTT',
+   title:'Object Counter tự động cho cửa hàng',
+   desc:'ESP32-CAM đếm số người vào/ra cửa hàng (object counting với line crossing). MQTT publish count realtime. Dashboard heatmap số khách theo giờ.',
+   steps:['ESP32-CAM setup với QVGA resolution','Background subtraction phát hiện movement','Virtual line: object cross từ trái sang phải = IN, ngược lại = OUT','MQTT: publish {"in":5,"out":3,"current":2} mỗi lần crossing','Grafana dashboard: khách hiện tại, tổng vào/ra, biểu đồ theo giờ'],
+   hint:'Background subtraction: absDiff(current_frame, bg_frame) > threshold.',
+   expected:'Đếm chính xác >85% trong điều kiện ánh sáng tốt'},
+
+  {id:'e22',cat:'TinyML',diff:'hard',time:'210 phút',hw:'ESP32 + Microphone array',
+   title:'Sound Event Detection (tiếng chó sủa, còi xe, v.v.)',
+   desc:'Train model phân loại 5 âm thanh: chó sủa, còi xe, kính vỡ, khóc trẻ em, tiếng nổ. Deploy ESP32 với INMP441 microphone. Gửi alert Telegram khi phát hiện nguy hiểm.',
+   steps:['Thu thập 60 mẫu × 5 class (nguồn: Freesound.org hoặc thu trực tiếp)','Edge Impulse: MFE block (Mel filterbank, không MFCC) cho sound events','CNN: Conv1D → MaxPool → Conv1D → Dense → 5 classes','Deploy + test realtime với INMP441','Alert: Telegram khi glass_break, baby_cry hoặc explosion detected'],
+   hint:'MFE tốt hơn MFCC cho sound events (không phải speech). 1s window, 44Hz stride.',
+   expected:'Accuracy >80% trên 5 classes, false alarm < 2 lần/phút trong môi trường im lặng'},
+
+  {id:'e23',cat:'Hệ thống',diff:'hard',time:'300 phút',hw:'Multiple ESP32 + Raspberry Pi',
+   title:'Fleet Management cho IoT Devices',
+   desc:'Quản lý fleet 5+ ESP32 nodes: OTA update đồng loạt, monitor health (heap, RSSI, uptime), remote reboot, config push từ central server. Dashboard Grafana.',
+   steps:['Central server: Node.js + MQTT + InfluxDB','ESP32 agents: heartbeat mỗi 30s (heap, RSSI, uptime, firmware version)','OTA trigger: pub topic "fleet/update" → tất cả check và download firmware mới','Config push: pub "fleet/config" JSON → apply ngay không cần reboot','Grafana: fleet overview panel, alert khi node offline > 5 phút'],
+   hint:'OTA trigger qua MQTT: subscribe "devices/+/ota", parse firmware URL từ payload.',
+   expected:'OTA cập nhật tất cả nodes trong <5 phút, fleet dashboard realtime'},
+
+  {id:'e24',cat:'Hệ thống',diff:'hard',time:'360 phút',hw:'ESP32 + Cloud',
+   title:'Edge-Cloud Hybrid AI Pipeline',
+   desc:'ESP32 xử lý AI đơn giản (classification) tại edge. Kết quả bất thường → gửi raw data lên Cloud (AWS Lambda) để phân tích chuyên sâu hơn. Giảm bandwidth 95%.',
+   steps:['ESP32: TFLite Micro classifier — normal/abnormal (2 class)','Nếu normal: chỉ publish aggregated stats mỗi 5 phút (bandwidth thấp)','Nếu abnormal: gửi raw window data lên AWS S3 via HTTPS','AWS Lambda trigger: nhận S3 event → run full model → store result DynamoDB','Dashboard: view edge decisions vs cloud reanalysis accuracy'],
+   hint:'S3 presigned URL: ESP32 request URL từ Lambda, dùng HTTP PUT upload thẳng lên S3.',
+   expected:'Bandwidth giảm >90%, cloud reanalysis accuracy >95%'},
+
+  {id:'e25',cat:'Khởi nghiệp',diff:'hard',time:'480 phút',hw:'ESP32 + Custom PCB',
+   title:'Thiết kế PCB cho sản phẩm AIoT',
+   desc:'Từ prototype breadboard → thiết kế PCB thực tế với KiCad. ESP32-WROOM tích hợp cảm biến, nguồn pin LiPo, charging circuit, mạch bảo vệ. Đặt sản xuất tại JLCPCB.',
+   steps:['Schematic: ESP32-WROOM + DHT22 + BMP280 + LiPo + TP4056 charger + AMS1117 3.3V','Symbol và footprint cho tất cả components','PCB layout 2-layer: route theo best practices (analog/digital separation, decoupling caps)','Design rule check: trace width, clearance, courtyard','Export Gerber → order JLCPCB (~5$ cho 5 PCBs, 7 ngày)'],
+   hint:'Decoupling: 100nF ceramic cap ngay cạnh mỗi VCC pin của MCU.',
+   expected:'PCB design hoàn chỉnh, Gerber file sẵn sàng để order'},
+
+  {id:'e26',cat:'Khởi nghiệp',diff:'hard',time:'240 phút',hw:'Máy tính',
+   title:'Technical Due Diligence cho AIoT Startup',
+   desc:'Đóng vai CTO đánh giá technical feasibility của 3 ý tưởng startup AIoT. Phân tích: tech stack, BOM cost, manufacturing risk, IP landscape, competitive moat, time-to-market.',
+   steps:['Ý tưởng 1: Smart waste bin (ultrasonic + LoRa + AI route optimization)','Ý tưởng 2: Wearable fall detection (ESP32-S3 + IMU + BLE + cloud AI)','Ý tưởng 3: Industrial air quality monitor (multi-sensor + FPGA + 5G)','Technical matrix: feasibility score, risk level, estimated BOM, moat','Recommendation report: chọn 1 ý tưởng với roadmap 12 tháng'],
+   hint:'BOM (Bill of Materials): liệt kê từng component với giá quantity 1000 units.',
+   expected:'Technical Due Diligence report 5-10 trang, có thể defend trước mentor'},
+]
+
+export const ALL_EXERCISES = [...EXERCISES, ...EXERCISES_EXTRA]
