@@ -139,7 +139,7 @@ aiot-edu/
 - **React 19** + Vite 6 + React Router 7
 - **HashRouter** — tương thích GitHub Pages
 - **CSS Variables** — dark theme, không dùng icons
-- **Be Vietnam Pro** + JetBrains Mono fonts (Google Fonts)
+- **Space Grotesk + Space Mono fonts (Google Fonts)
 - **Code splitting** — lazy load data chunks
 
 ---
