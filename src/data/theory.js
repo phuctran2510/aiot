@@ -2410,10 +2410,10 @@ Physical Asset ──sensor data──→ Digital Twin ──simulation──→
 // ═══ CHƯƠNG 8 — GIAO THỨC NÂNG CAO & CLOUD ═══════════════════════
 export const THEORY_EXTRA = [
   {
-    id:'c8', title:'Cloud & DevOps cho AIoT', color:'#2dd4bf',
+    id:'c12', title:'Cloud & DevOps cho AIoT', color:'#2dd4bf',
     sections:[
       {
-        id:'c8s1', title:'Docker & Containerization',
+        id:'c12s1', title:'Docker & Containerization',
         content:`## Docker cho AIoT Stack
 
 ### Tại sao cần Docker?
@@ -2515,7 +2515,7 @@ datasources:
 \`\`\``
       },
       {
-        id:'c8s2', title:'MQTT over TLS & Auth',
+        id:'c12s2', title:'MQTT over TLS & Auth',
         content:`## Bảo mật MQTT với TLS và Authentication
 
 ### Tại sao cần bảo mật MQTT?
@@ -2623,7 +2623,7 @@ topic readwrite homeassistant/#
 \`\`\``
       },
       {
-        id:'c8s3', title:'AWS IoT Core & Azure IoT Hub',
+        id:'c12s3', title:'AWS IoT Core & Azure IoT Hub',
         content:`## Cloud IoT Platforms
 
 ### So sánh Cloud IoT Platforms
@@ -2727,10 +2727,10 @@ def lambda_handler(event, context):
   },
 
   {
-    id:'c9', title:'Xử lý tín hiệu số (DSP)', color:'#f59e0b',
+    id:'c13', title:'Xử lý tín hiệu số (DSP)', color:'#f59e0b',
     sections:[
       {
-        id:'c9s1', title:'FFT & Spectral Analysis',
+        id:'c13s1', title:'FFT & Spectral Analysis',
         content:`## Fast Fourier Transform cho AIoT
 
 ### Tại sao FFT quan trọng?
@@ -2829,7 +2829,7 @@ features = extract_fft_features(signal)  # 16 features
 \`\`\``,
       },
       {
-        id:'c9s2', title:'Kalman Filter & Sensor Fusion',
+        id:'c13s2', title:'Kalman Filter & Sensor Fusion',
         content:`## Kalman Filter & Sensor Fusion
 
 ### Vấn đề với cảm biến thực tế
@@ -2937,10 +2937,10 @@ void updateAngles() {
   },
 
   {
-    id:'c10', title:'Deep Learning nâng cao', color:'#a855f7',
+    id:'c14', title:'Deep Learning nâng cao', color:'#a855f7',
     sections:[
       {
-        id:'c10s1', title:'Transfer Learning',
+        id:'c14s1', title:'Transfer Learning',
         content:`## Transfer Learning cho AIoT
 
 ### Khái niệm
@@ -3017,7 +3017,7 @@ train_ds = raw_train_ds.map(
 \`\`\``,
       },
       {
-        id:'c10s2', title:'Reinforcement Learning cho IoT',
+        id:'c14s2', title:'Reinforcement Learning cho IoT',
         content:`## Reinforcement Learning cho Điều khiển IoT
 
 ### Khái niệm RL
@@ -3108,10 +3108,10 @@ void controlAC(float temp, int hour, bool occupied) {
   },
 
   {
-    id:'c11', title:'ESP-IDF & Lập trình chuyên sâu', color:'#00d4ff',
+    id:'c15', title:'ESP-IDF & Lập trình chuyên sâu', color:'#00d4ff',
     sections:[
       {
-        id:'c11s1', title:'ESP-IDF vs Arduino',
+        id:'c15s1', title:'ESP-IDF vs Arduino',
         content:`## ESP-IDF — Framework chuyên nghiệp
 
 ### So sánh ESP-IDF vs Arduino Framework
