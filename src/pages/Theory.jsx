@@ -11,7 +11,6 @@ function CopyBtn({ code }) {
   )
 }
 
-// Escape HTML ký tự đặc biệt, sau đó apply markdown bold/code
 function renderInline(s) {
   if (typeof s !== 'string') return ''
   return s
@@ -27,140 +26,79 @@ function Md({ text }) {
   const lines = text.trim().split('\n')
   const out = []
   let i = 0
-
   while (i < lines.length) {
     const l = lines[i] || ''
-
-    // ── Code block ──────────────────────────────
     if (l.startsWith('```')) {
       const code = []; i++
       while (i < lines.length && !lines[i].startsWith('```')) { code.push(lines[i]); i++ }
       const raw = code.join('\n')
-      // Code block dùng {children} text thông thường - không qua HTML parser
-      out.push(
-        <div key={`pre${i}`} style={{ position: 'relative', margin: '.5rem 0' }}>
-          <pre><code style={{ color: '#b8d4e8' }}>{raw}</code></pre>
-          <CopyBtn code={raw} />
-        </div>
-      )
+      out.push(<div key={`pre${i}`} style={{position:'relative',margin:'.5rem 0'}}><pre><code style={{color:'#b8d4e8'}}>{raw}</code></pre><CopyBtn code={raw}/></div>)
       i++; continue
     }
-
-    // ── Table ────────────────────────────────────
     if (l.startsWith('|')) {
       const rows = []
       while (i < lines.length && lines[i].startsWith('|')) {
-        if (!lines[i].includes('---'))
-          rows.push(lines[i].split('|').filter(Boolean).map(c => c.trim()))
+        if (!lines[i].includes('---')) rows.push(lines[i].split('|').filter(Boolean).map(c => c.trim()))
         i++
       }
       if (rows.length > 0) {
         const [hd, ...bd] = rows
-        out.push(
-          <div key={`tbl${i}`} className="tw">
-            <table>
-              <thead>
-                <tr>{hd.map((h, j) => <th key={j} dangerouslySetInnerHTML={{ __html: renderInline(h) }} />)}</tr>
-              </thead>
-              <tbody>
-                {bd.map((r, ri) => (
-                  <tr key={ri}>
-                    {r.map((c, ci) => <td key={ci} dangerouslySetInnerHTML={{ __html: renderInline(c) }} />)}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )
+        out.push(<div key={`tbl${i}`} className="tw"><table><thead><tr>{hd.map((h,j)=><th key={j} dangerouslySetInnerHTML={{__html:renderInline(h)}}/>)}</tr></thead><tbody>{bd.map((r,ri)=><tr key={ri}>{r.map((c,ci)=><td key={ci} dangerouslySetInnerHTML={{__html:renderInline(c)}}/>)}</tr>)}</tbody></table></div>)
       }
       continue
     }
-
-    // ── Headings ─────────────────────────────────
-    if (l.startsWith('## ')) {
-      out.push(<h2 key={`h2${i}`} style={{ fontSize: '.97rem', color: 'var(--c)', margin: '1.2rem 0 .5rem', borderBottom: '1px solid var(--brd)', paddingBottom: '.3rem' }}>{l.slice(3)}</h2>)
-      i++; continue
-    }
-    if (l.startsWith('### ')) {
-      out.push(<h3 key={`h3${i}`} style={{ fontSize: '.91rem', color: 'var(--txt)', margin: '.9rem 0 .36rem', fontWeight: 600 }}>{l.slice(4)}</h3>)
-      i++; continue
-    }
-
-    // ── Divider ──────────────────────────────────
-    if (l.trim() === '---') {
-      out.push(<div key={`hr${i}`} className="divider" />)
-      i++; continue
-    }
-
-    // ── Bullet list ──────────────────────────────
+    if (l.startsWith('## ')) { out.push(<h2 key={`h2${i}`} style={{fontSize:'.97rem',color:'var(--c)',margin:'1.2rem 0 .5rem',borderBottom:'1px solid var(--brd)',paddingBottom:'.3rem'}}>{l.slice(3)}</h2>); i++; continue }
+    if (l.startsWith('### ')) { out.push(<h3 key={`h3${i}`} style={{fontSize:'.91rem',color:'var(--txt)',margin:'.9rem 0 .36rem',fontWeight:600}}>{l.slice(4)}</h3>); i++; continue }
+    if (l.trim() === '---') { out.push(<div key={`hr${i}`} className="divider"/>); i++; continue }
     if (l.match(/^[-*] /)) {
       const items = []
       while (i < lines.length && lines[i].match(/^[-*] /)) { items.push(lines[i].slice(2)); i++ }
-      out.push(
-        <ul key={`ul${i}`} className="ul">
-          {items.map((it, j) => (
-            <li key={j} dangerouslySetInnerHTML={{ __html: renderInline(it) }} />
-          ))}
-        </ul>
-      )
+      out.push(<ul key={`ul${i}`} className="ul">{items.map((it,j)=><li key={j} dangerouslySetInnerHTML={{__html:renderInline(it)}}/>)}</ul>)
       continue
     }
-
-    // ── Numbered list ────────────────────────────
     if (l.match(/^\d+\. /)) {
       const items = []
-      while (i < lines.length && lines[i].match(/^\d+\. /)) {
-        items.push(lines[i].replace(/^\d+\. /, ''))
-        i++
-      }
-      out.push(
-        <ol key={`ol${i}`} className="ol">
-          {items.map((it, j) => (
-            <li key={j} dangerouslySetInnerHTML={{ __html: renderInline(it) }} />
-          ))}
-        </ol>
-      )
+      while (i < lines.length && lines[i].match(/^\d+\. /)) { items.push(lines[i].replace(/^\d+\. /,'')); i++ }
+      out.push(<ol key={`ol${i}`} className="ol">{items.map((it,j)=><li key={j} dangerouslySetInnerHTML={{__html:renderInline(it)}}/>)}</ol>)
       continue
     }
-
-    // ── Empty line ───────────────────────────────
     if (l.trim() === '') { i++; continue }
-
-    // ── Paragraph ────────────────────────────────
-    out.push(
-      <p key={`p${i}`}
-        style={{ color: 'var(--txt2)', margin: '.2rem 0 .55rem', fontSize: '.86rem', lineHeight: 1.75 }}
-        dangerouslySetInnerHTML={{ __html: renderInline(l) }}
-      />
-    )
+    out.push(<p key={`p${i}`} style={{color:'var(--txt2)',margin:'.2rem 0 .55rem',fontSize:'.86rem',lineHeight:1.75}} dangerouslySetInnerHTML={{__html:renderInline(l)}}/>)
     i++
   }
-
   return <>{out}</>
 }
 
 export default function Theory() {
-  const chapters = Array.isArray(ALL_THEORY) ? ALL_THEORY : []
-  const [ch, setCh] = useState(chapters[0])
-  const [sc, setSc] = useState(chapters[0]?.sections?.[0])
+  // Defensive: đảm bảo luôn có array hợp lệ
+  const chapters = (Array.isArray(ALL_THEORY) ? ALL_THEORY : []).filter(c => c && c.id && c.sections?.length)
 
+  const [ch, setCh]   = useState(() => chapters[0] ?? null)
+  const [sc, setSc]   = useState(() => chapters[0]?.sections?.[0] ?? null)
+
+  // Nếu data chưa load hoặc rỗng → hiển thị loading thay vì crash
   if (!chapters.length || !ch || !sc) {
-    return <div style={{ padding: '2rem', color: 'var(--txt2)' }}>Dang tai noi dung...</div>
+    return (
+      <div style={{padding:'2rem',color:'var(--txt2)',textAlign:'center'}}>
+        <div style={{fontSize:'1.2rem',marginBottom:'.5rem',color:'var(--c)'}}>Dang tai ly thuyet...</div>
+        <div style={{fontSize:'.8rem',color:'var(--txt3)'}}>Chapters loaded: {chapters.length}</div>
+      </div>
+    )
   }
 
-  const pick = c => { setCh(c); setSc(c.sections[0]); window.scrollTo(0, 0) }
-  const chIdx = chapters.indexOf(ch)
-  const scIdx  = ch.sections.indexOf(sc)
+  const pick    = c => { setCh(c); setSc(c.sections[0]); window.scrollTo(0,0) }
+  const chIdx   = chapters.indexOf(ch)
+  const scIdx   = ch.sections.indexOf(sc)
   const hasPrev = chIdx > 0 || scIdx > 0
   const hasNext = chIdx < chapters.length - 1 || scIdx < ch.sections.length - 1
 
   const goPrev = () => {
-    if (scIdx > 0) { setSc(ch.sections[scIdx - 1]); window.scrollTo(0, 0) }
-    else if (chIdx > 0) { const p = chapters[chIdx - 1]; setCh(p); setSc(p.sections[p.sections.length - 1]); window.scrollTo(0, 0) }
+    if (scIdx > 0) { setSc(ch.sections[scIdx-1]); window.scrollTo(0,0) }
+    else if (chIdx > 0) { const p = chapters[chIdx-1]; setCh(p); setSc(p.sections[p.sections.length-1]); window.scrollTo(0,0) }
   }
   const goNext = () => {
-    if (scIdx < ch.sections.length - 1) { setSc(ch.sections[scIdx + 1]); window.scrollTo(0, 0) }
-    else if (chIdx < chapters.length - 1) { const nx = chapters[chIdx + 1]; setCh(nx); setSc(nx.sections[0]); window.scrollTo(0, 0) }
+    if (scIdx < ch.sections.length-1) { setSc(ch.sections[scIdx+1]); window.scrollTo(0,0) }
+    else if (chIdx < chapters.length-1) { const nx = chapters[chIdx+1]; setCh(nx); setSc(nx.sections[0]); window.scrollTo(0,0) }
   }
 
   return (
@@ -170,65 +108,57 @@ export default function Theory() {
         <p>{chapters.length} chuong — nen tang IoT den Deep Learning, FPGA va Khoi nghiep</p>
       </div>
 
-      {/* Mobile: chip tabs */}
-      <div className="mob" style={{ display: 'flex', gap: '.3rem', overflowX: 'auto', paddingBottom: '.4rem', marginBottom: '.7rem', scrollbarWidth: 'none' }}>
+      {/* Mobile scroll */}
+      <div className="mob" style={{display:'flex',gap:'.3rem',overflowX:'auto',paddingBottom:'.4rem',marginBottom:'.7rem',scrollbarWidth:'none'}}>
         {chapters.map(c => (
           <button key={c.id} onClick={() => pick(c)} style={{
-            padding: '.3rem .62rem', borderRadius: 7, flexShrink: 0,
-            background: ch.id === c.id ? `${c.color}14` : 'var(--sur)',
-            border: `1px solid ${ch.id === c.id ? c.color + '35' : 'var(--brd)'}`,
-            color: ch.id === c.id ? c.color : 'var(--txt3)',
-            cursor: 'pointer', fontSize: '.73rem', whiteSpace: 'nowrap'
-          }}>
-            {c.title}
-          </button>
+            padding:'.3rem .62rem',borderRadius:7,flexShrink:0,
+            background: ch.id===c.id ? `${c.color}14` : 'var(--sur)',
+            border: `1px solid ${ch.id===c.id ? c.color+'35' : 'var(--brd)'}`,
+            color: ch.id===c.id ? c.color : 'var(--txt3)',
+            cursor:'pointer',fontSize:'.73rem',whiteSpace:'nowrap'
+          }}>{c.title}</button>
         ))}
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '185px 1fr', gap: '1.1rem', alignItems: 'start' }}>
+      <div style={{display:'grid',gridTemplateColumns:'185px 1fr',gap:'1.1rem',alignItems:'start'}}>
         {/* Desktop sidebar */}
-        <div style={{ position: 'sticky', top: '1rem' }} className="desk">
+        <div style={{position:'sticky',top:'1rem'}} className="desk">
           {chapters.map(c => (
             <button key={c.id} onClick={() => pick(c)} style={{
-              display: 'flex', alignItems: 'center', gap: '.42rem', width: '100%',
-              padding: '.4rem .6rem', borderRadius: 7, marginBottom: 2,
-              background: ch.id === c.id ? `${c.color}0d` : 'transparent',
-              border: `1px solid ${ch.id === c.id ? c.color + '28' : 'transparent'}`,
-              cursor: 'pointer', textAlign: 'left', transition: 'all .12s'
+              display:'flex',alignItems:'center',gap:'.42rem',width:'100%',
+              padding:'.4rem .6rem',borderRadius:7,marginBottom:2,
+              background: ch.id===c.id ? `${c.color}0d` : 'transparent',
+              border: `1px solid ${ch.id===c.id ? c.color+'28' : 'transparent'}`,
+              cursor:'pointer',textAlign:'left',transition:'all .12s'
             }}>
-              <div style={{ width: 7, height: 7, borderRadius: '50%', background: c.color, opacity: ch.id === c.id ? 1 : .4, flexShrink: 0 }} />
-              <span style={{ fontSize: '.78rem', color: ch.id === c.id ? c.color : 'var(--txt2)', fontWeight: ch.id === c.id ? 600 : 400, lineHeight: 1.3 }}>
-                {c.title}
-              </span>
+              <div style={{width:7,height:7,borderRadius:'50%',background:c.color,opacity:ch.id===c.id?1:.4,flexShrink:0}}/>
+              <span style={{fontSize:'.78rem',color:ch.id===c.id?c.color:'var(--txt2)',fontWeight:ch.id===c.id?600:400,lineHeight:1.3}}>{c.title}</span>
             </button>
           ))}
         </div>
 
         {/* Content */}
         <div className="fu">
-          <div className="card" style={{ padding: '.95rem 1.1rem', marginBottom: '.75rem', background: `${ch.color}06`, borderColor: `${ch.color}22` }}>
-            <span className="badge" style={{ background: `${ch.color}12`, color: ch.color, border: `1px solid ${ch.color}28`, marginBottom: '.4rem', display: 'inline-flex' }}>
-              {ch.title}
-            </span>
-            <h2 style={{ fontWeight: 800, fontSize: '1.05rem', marginTop: '.3rem' }}>{sc.title}</h2>
+          <div className="card" style={{padding:'.95rem 1.1rem',marginBottom:'.75rem',background:`${ch.color}06`,borderColor:`${ch.color}22`}}>
+            <span className="badge" style={{background:`${ch.color}12`,color:ch.color,border:`1px solid ${ch.color}28`,marginBottom:'.4rem',display:'inline-flex'}}>{ch.title}</span>
+            <h2 style={{fontWeight:800,fontSize:'1.05rem',marginTop:'.3rem'}}>{sc.title}</h2>
           </div>
 
           {ch.sections.length > 1 && (
             <div className="tabs">
               {ch.sections.map(s => (
-                <button key={s.id} className={`tab${sc.id === s.id ? ' on' : ''}`}
-                  onClick={() => { setSc(s); window.scrollTo(0, 0) }}>
-                  {s.title}
-                </button>
+                <button key={s.id} className={`tab${sc.id===s.id?' on':''}`}
+                  onClick={() => { setSc(s); window.scrollTo(0,0) }}>{s.title}</button>
               ))}
             </div>
           )}
 
-          <div className="card" style={{ padding: '1.1rem 1.2rem' }}>
-            <Md text={sc.content} />
+          <div className="card" style={{padding:'1.1rem 1.2rem'}}>
+            <Md text={sc.content}/>
           </div>
 
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '.75rem', gap: '.5rem' }}>
+          <div style={{display:'flex',justifyContent:'space-between',marginTop:'.75rem',gap:'.5rem'}}>
             <button className="btn btn-s" disabled={!hasPrev} onClick={goPrev}>Trang truoc</button>
             <button className="btn btn-o" disabled={!hasNext} onClick={goNext}>Trang tiep</button>
           </div>
