@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { QUIZ } from '../data/quiz'
+import { QUIZ } from '../data/content'
 
 const CATS = ['all', ...new Set(QUIZ.map(q => q.cat))]
 const LVS  = ['all', 'easy', 'medium', 'hard']

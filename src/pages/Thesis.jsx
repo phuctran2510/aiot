@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { THESIS } from '../data/thesis'
+import { THESIS } from '../data/content'
 
 const LEVELS = { easy:'Co ban', medium:'Trung binh', hard:'Kho', advanced:'Nang cao', startup:'Khoi nghiep' }
 const LC = { easy:'var(--g)', medium:'var(--c)', hard:'var(--y)', advanced:'var(--p)', startup:'var(--o)' }

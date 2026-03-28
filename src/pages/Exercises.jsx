@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { EXERCISES } from '../data/exercises'
+import { EXERCISES } from '../data/content'
 
 const DC = d => d==='easy'?'var(--g)':d==='medium'?'var(--c)':'var(--p)'
 const DL = d => d==='easy'?'Co ban':d==='medium'?'Trung binh':'Nang cao'
