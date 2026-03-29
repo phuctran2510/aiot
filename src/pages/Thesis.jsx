@@ -15,7 +15,7 @@ export default function Thesis() {
     const t = THESIS.find(x => x.id === sel)
     return (
       <div className="fu">
-        <button className="btn btn-s" style={{marginBottom:'1.1rem'}} onClick={() => { setSel(null); setTab('overview') }}>Danh sach de tai</button>
+        <button className="btn btn-s" style={{marginBottom:'1.1rem'}} onClick={() => { setSel(null); setTab('overview') }}>Danh sách đề tài</button>
 
         <div className="card" style={{padding:'1.2rem',borderColor:`${t.color}28`,background:`${t.color}04`,marginBottom:'1.1rem'}}>
           <div style={{display:'flex',gap:'.45rem',flexWrap:'wrap',marginBottom:'.55rem',alignItems:'center'}}>
@@ -29,7 +29,7 @@ export default function Thesis() {
         </div>
 
         <div className="tabs">
-          {[['overview','Tong quan'],['scope','Pham vi'],['deploy','Ke hoach'],['result','Ket qua'],['tech','Cong nghe']].map(([k,l]) => (
+          {[['overview','Tổng quan'],['scope','Phạm vi'],['deploy','Kế hoạch'],['result','Kết quả'],['tech','Công nghệ']].map(([k,l]) => (
             <button key={k} className={`tab${tab===k?' on':''}`} onClick={() => setTab(k)}>{l}</button>
           ))}
         </div>
