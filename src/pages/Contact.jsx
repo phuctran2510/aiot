@@ -43,11 +43,11 @@ export default function Contact() {
         {/* Info cards */}
         <div style={{display:'flex',flexDirection:'column',gap:'1rem'}}>
           <div className="card" style={{padding:'1.1rem'}}>
-            <div style={{fontSize:'.65rem',color:'var(--txt3)',fontFamily:'var(--fm)',textTransform:'uppercase',letterSpacing:'.07em',marginBottom:'.55rem'}}>Giờ tiếp sinh viên</div>
+            <div style={{fontSize:'.65rem',color:'var(--txt3)',fontFamily:'var(--fm)',textTransform:'uppercase',letterSpacing:'.07em',marginBottom:'.55rem'}}>Liên hệ</div>
             <ul className="ul">
-              <li>Thứ 2, 4, 6: 8:00 – 11:30</li>
-              <li>Thứ 3, 5: 14:00 – 17:00</li>
-              <li>Phòng A2.05 — Khoa CNTT, DLU</li>
+              <li>phuctv@dlu.edu.vn</li>
+              <li>0976353606</li>
+              <li>Nhà A7 — Khoa CNTT, DLU</li>
               <li>Ngoài giờ: liên hệ qua email trước 24h</li>
             </ul>
           </div>
