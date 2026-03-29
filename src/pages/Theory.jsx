@@ -104,8 +104,8 @@ export default function Theory() {
   return (
     <div>
       <div className="page-hdr">
-        <h1><span className="gt">Ly thuyet AIoT</span></h1>
-        <p>{chapters.length} chuong — nen tang IoT den Deep Learning, FPGA va Khoi nghiep</p>
+        <h1><span className="gt">Lý thuyết AIoT</span></h1>
+        <p>{chapters.length} Chương — Nền tảng IoT đến Deep Learning, FPGA và khởi nghiệp</p>
       </div>
 
       {/* Mobile scroll */}
@@ -159,8 +159,8 @@ export default function Theory() {
           </div>
 
           <div style={{display:'flex',justifyContent:'space-between',marginTop:'.75rem',gap:'.5rem'}}>
-            <button className="btn btn-s" disabled={!hasPrev} onClick={goPrev}>Trang truoc</button>
-            <button className="btn btn-o" disabled={!hasNext} onClick={goNext}>Trang tiep</button>
+            <button className="btn btn-s" disabled={!hasPrev} onClick={goPrev}>Trang trước</button>
+            <button className="btn btn-o" disabled={!hasNext} onClick={goNext}>Trang tiếp</button>
           </div>
         </div>
       </div>

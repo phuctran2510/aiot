@@ -22,7 +22,7 @@ export default function Exercises() {
       <div style={{display:'flex',gap:'.45rem',flexWrap:'wrap',marginBottom:'1rem'}}>
         <select value={diff} onChange={e=>setDiff(e.target.value)}
           style={{padding:'.38rem .65rem',background:'var(--sur)',border:'1px solid var(--brd)',color:'var(--txt)',borderRadius:6,fontSize:'.81rem',fontFamily:'var(--fd)'}}>
-          <option value="all">Tat ca do kho</option>
+          <option value="all">Tất cả độ khó</option>
           {['easy','medium','hard'].map(d=><option key={d} value={d}>{DL(d)}</option>)}
         </select>
         <select value={cat} onChange={e=>setCat(e.target.value)}
