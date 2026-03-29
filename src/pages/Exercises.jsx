@@ -55,11 +55,11 @@ export default function Exercises() {
                 <ol className="ol">{ex.steps.map((s,i)=><li key={i}>{s}</li>)}</ol>
                 {ex.hint && (
                   <div className="alert aw" style={{marginTop:'.65rem',fontSize:'.82rem'}}>
-                    <strong>Goi y:</strong> {ex.hint}
+                    <strong>Gợi ý:</strong> {ex.hint}
                   </div>
                 )}
                 <div className="alert as" style={{marginTop:'.5rem',fontSize:'.83rem'}}>
-                  <strong>Ket qua mong doi:</strong> {ex.expected}
+                  <strong>Kết quả mong đợi:</strong> {ex.expected}
                 </div>
               </div>
             )}

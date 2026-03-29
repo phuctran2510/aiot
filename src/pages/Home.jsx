@@ -100,7 +100,7 @@ export default function Home() {
 
       {/* Hot topics */}
       <div style={{marginBottom:'2rem'}}>
-        <div style={{fontSize:'.6rem',color:'var(--txt3)',fontFamily:'var(--fm)',marginBottom:'.65rem',textTransform:'uppercase',letterSpacing:'.08em'}}>Chủ đề nổi bật 2025</div>
+        <div style={{fontSize:'.6rem',color:'var(--txt3)',fontFamily:'var(--fm)',marginBottom:'.65rem',textTransform:'uppercase',letterSpacing:'.08em'}}>Chủ đề nổi bật 2026</div>
         <div style={{display:'flex',flexWrap:'wrap',gap:'.38rem'}}>
           {hotTopics.map((t,i) => (
             <span key={i} style={{padding:'.22rem .65rem',borderRadius:999,background:`${t.c}0d`,border:`1px solid ${t.c}28`,color:t.c,fontSize:'.74rem',fontFamily:'var(--fm)',fontWeight:600}}>{t.tag}</span>
