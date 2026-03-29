@@ -162,21 +162,31 @@ export default function App() {
 }
 const S = {
   wrap:{
-    height:'100vh',
-    display:'flex',
-    alignItems:'center',
-    justifyContent:'center',
-    background:'#0f172a'
-  },
-  card:{
-    display:'grid',
-    gridTemplateColumns:'1fr 1fr',
-    width:800,
-    background:'#111827',
-    borderRadius:12,
-    overflow:'hidden',
-    color:'#fff'
-  },
+  height:'100vh',
+  display:'flex',
+  alignItems:'center',
+  justifyContent:'center',
+  background:'radial-gradient(circle at 20% 20%, #1d4ed8, transparent 40%), radial-gradient(circle at 80% 80%, #22c55e, transparent 40%), #020617'
+},
+  ccard:{
+  display:'grid',
+  gridTemplateColumns:'1fr 1fr',
+  width:900,
+  backdropFilter:'blur(20px)',
+  background:'rgba(15,23,42,0.6)',
+  border:'1px solid rgba(255,255,255,0.08)',
+  borderRadius:20,
+  overflow:'hidden',
+  color:'#fff',
+  boxShadow:'0 20px 60px rgba(0,0,0,0.6)'
+},
+logo:{
+  fontSize:'2.5rem',
+  fontWeight:900,
+  background:'linear-gradient(135deg,#22c55e,#3b82f6)',
+  WebkitBackgroundClip:'text',
+  WebkitTextFillColor:'transparent'
+},
   left:{
     padding:'2rem'
   },
@@ -184,10 +194,7 @@ const S = {
     padding:'2rem',
     background:'#020617'
   },
-  logo:{
-    fontSize:'2rem',
-    fontWeight:800
-  },
+ 
   title:{
     marginTop:10
   },
@@ -196,18 +203,29 @@ const S = {
     color:'#94a3b8'
   },
   input:{
-    width:'100%',
-    padding:10,
-    marginTop:20,
-    marginBottom:10
-  },
+  width:'100%',
+  padding:'14px',
+  marginTop:20,
+  marginBottom:12,
+  borderRadius:10,
+  border:'1px solid rgba(255,255,255,0.1)',
+  background:'rgba(255,255,255,0.05)',
+  color:'#fff',
+  outline:'none',
+  transition:'all .2s'
+},
+
   btn:{
-    width:'100%',
-    padding:10,
-    background:'#22c55e',
-    border:'none',
-    cursor:'pointer'
-  },
+  width:'100%',
+  padding:'14px',
+  borderRadius:10,
+  background:'linear-gradient(135deg,#22c55e,#4ade80)',
+  border:'none',
+  fontWeight:600,
+  cursor:'pointer',
+  transition:'all .25s'
+},
+
   contactTitle:{
     marginBottom:10
   },
@@ -218,5 +236,6 @@ const S = {
     marginTop:10,
     fontSize:'.8rem',
     color:'#94a3b8'
-  }
+  },
+  
 }
