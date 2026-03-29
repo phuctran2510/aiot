@@ -32,7 +32,7 @@ function Login({ onLogin }) {
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    if (pwd === '123456') { // 👉 đổi mật khẩu ở đây
+    if (pwd === 'aiot2026') { // 👉 đổi mật khẩu ở đây
       localStorage.setItem('auth', 'true')
       onLogin(true)
     } else {
