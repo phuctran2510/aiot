@@ -160,3 +160,63 @@ export default function App() {
     </div>
   )
 }
+const S = {
+  wrap:{
+    height:'100vh',
+    display:'flex',
+    alignItems:'center',
+    justifyContent:'center',
+    background:'#0f172a'
+  },
+  card:{
+    display:'grid',
+    gridTemplateColumns:'1fr 1fr',
+    width:800,
+    background:'#111827',
+    borderRadius:12,
+    overflow:'hidden',
+    color:'#fff'
+  },
+  left:{
+    padding:'2rem'
+  },
+  right:{
+    padding:'2rem',
+    background:'#020617'
+  },
+  logo:{
+    fontSize:'2rem',
+    fontWeight:800
+  },
+  title:{
+    marginTop:10
+  },
+  subtitle:{
+    fontSize:'.9rem',
+    color:'#94a3b8'
+  },
+  input:{
+    width:'100%',
+    padding:10,
+    marginTop:20,
+    marginBottom:10
+  },
+  btn:{
+    width:'100%',
+    padding:10,
+    background:'#22c55e',
+    border:'none',
+    cursor:'pointer'
+  },
+  contactTitle:{
+    marginBottom:10
+  },
+  info:{
+    lineHeight:1.8
+  },
+  note:{
+    marginTop:10,
+    fontSize:'.8rem',
+    color:'#94a3b8'
+  }
+}
