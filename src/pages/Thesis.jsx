@@ -48,12 +48,12 @@ export default function Thesis() {
   return (
     <div className="fu">
       <div className="page-hdr">
-        <h1><span className="gt">De tai NCKH</span></h1>
-        <p>{THESIS.length} de tai — tu co ban den startup, giu nguyen de tai cu va them moi</p>
+        <h1><span className="gt">Đề tài NCKH</span></h1>
+        <p>{THESIS.length} ĐỀ tài từ cơ bản đến nâng cao và khởi nghiệp dành cho SV</p>
       </div>
 
       <div className="tabs" style={{marginBottom:'1rem'}}>
-        <button className={`tab${lv==='all'?' on':''}`} onClick={()=>setLv('all')}>Tat ca ({THESIS.length})</button>
+        <button className={`tab${lv==='all'?' on':''}`} onClick={()=>setLv('all')}>Tất Cả({THESIS.length})</button>
         {Object.entries(LEVELS).map(([k,l]) => (
           <button key={k} className={`tab${lv===k?' on':''}`} onClick={()=>setLv(k)}
             style={lv===k?{color:LC[k]||'var(--c)',borderBottomColor:LC[k]||'var(--c)'}:{}}>
