@@ -20,8 +20,8 @@ export default function Thesis() {
         <div className="card" style={{padding:'1.2rem',borderColor:`${t.color}28`,background:`${t.color}04`,marginBottom:'1.1rem'}}>
           <div style={{display:'flex',gap:'.45rem',flexWrap:'wrap',marginBottom:'.55rem',alignItems:'center'}}>
             <span className="badge" style={{background:`${LC[t.level]||t.color}12`,color:LC[t.level]||t.color,border:`1px solid ${LC[t.level]||t.color}28`}}>{LEVELS[t.level]||t.level}</span>
-            <span style={{fontSize:'.74rem',color:'var(--txt3)'}}>Thoi gian: {t.dur}</span>
-            <span style={{fontSize:'.74rem',color:'var(--txt3)'}}>Nhom: {t.team}</span>
+            <span style={{fontSize:'.74rem',color:'var(--txt3)'}}>Thời gian: {t.dur}</span>
+            <span style={{fontSize:'.74rem',color:'var(--txt3)'}}>Nhóm: {t.team}</span>
           </div>
           <h2 style={{fontWeight:800,fontSize:'1.08rem',marginBottom:'.22rem'}}>{t.title}</h2>
           <p style={{fontSize:'.79rem',color:t.color,fontFamily:'var(--fm)',marginBottom:'.55rem'}}>{t.sub}</p>
