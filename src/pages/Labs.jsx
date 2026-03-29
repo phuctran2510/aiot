@@ -11,7 +11,7 @@ function CopyBtn({ code }) {
   )
 }
 
-const diffLabel = d => d === 'easy' ? 'Co ban' : d === 'medium' ? 'Trung cap' : 'Nang cao'
+const diffLabel = d => d === 'easy' ? 'Cơ bàn' : d === 'medium' ? 'Trung cấp' : 'Nâng cao'
 const diffColor = d => d === 'easy' ? 'var(--g)' : d === 'medium' ? 'var(--c)' : 'var(--p)'
 
 // ─── LabDetail — OUTSIDE main component ───────────────────────────────────
@@ -24,7 +24,7 @@ function LabDetail({ lab, done, setDone, onBack }) {
     <div>
       {/* Top bar */}
       <div style={{ display:'flex', gap:'.5rem', marginBottom:'1rem', flexWrap:'wrap', alignItems:'center' }}>
-        <button className="btn btn-s" onClick={onBack}>← Quay lai</button>
+        <button className="btn btn-s" onClick={onBack}>← Quay lại</button>
         <span className="badge" style={{ background:`${diffColor(lab.diff)}12`, color:diffColor(lab.diff), border:`1px solid ${diffColor(lab.diff)}28` }}>
           {diffLabel(lab.diff)}
         </span>
@@ -63,7 +63,7 @@ function LabDetail({ lab, done, setDone, onBack }) {
 
       {/* Tabs */}
       <div className="tabs">
-        {[['steps','Cac buoc'],['theory','Ly thuyet'],['verify','Kiem tra']].map(([k,l]) => (
+        {[['steps','Các bước'],['theory','Lý thuyết'],['verify','Kiểm tra']].map(([k,l]) => (
           <button key={k} className={`tab${tab===k?' on':''}`} onClick={() => setTab(k)}>{l}</button>
         ))}
       </div>
@@ -106,7 +106,7 @@ function LabDetail({ lab, done, setDone, onBack }) {
             </div>
           ))}
 
-          {lab.expect && <div className="alert as" style={{ marginTop:'.6rem', fontSize:'.83rem' }}><strong>Ket qua:</strong> {lab.expect}</div>}
+          {lab.expect && <div className="alert as" style={{ marginTop:'.6rem', fontSize:'.83rem' }}><strong>Kết quả:</strong> {lab.expect}</div>}
           {lab.tips?.length > 0 && (
             <div className="alert aw" style={{ marginTop:'.5rem', fontSize:'.82rem' }}>
               <strong>Tips:</strong>
@@ -115,11 +115,11 @@ function LabDetail({ lab, done, setDone, onBack }) {
           )}
 
           <div style={{ display:'flex', gap:'.5rem', marginTop:'.8rem', flexWrap:'wrap' }}>
-            <button className="btn btn-s" disabled={step===0} onClick={e => { e.stopPropagation(); setStep(s=>s-1) }}>Buoc truoc</button>
-            <button className="btn btn-o" disabled={step===lab.steps.length-1} onClick={e => { e.stopPropagation(); setStep(s=>s+1) }}>Buoc tiep</button>
+            <button className="btn btn-s" disabled={step===0} onClick={e => { e.stopPropagation(); setStep(s=>s-1) }}>Bước trước</button>
+            <button className="btn btn-o" disabled={step===lab.steps.length-1} onClick={e => { e.stopPropagation(); setStep(s=>s+1) }}>Bước tiếp</button>
             {step === lab.steps.length-1 && (
               <button className="btn btn-p" onClick={() => { setDone(p=>({...p,[lab.id]:true})); setTab('verify') }}>
-                Hoan thanh
+                Hoàn thành
               </button>
             )}
           </div>
@@ -130,7 +130,7 @@ function LabDetail({ lab, done, setDone, onBack }) {
       {tab === 'theory' && (
         <div className="card" style={{ padding:'1.2rem' }}>
           <div className="alert ai" style={{ fontSize:'.85rem', lineHeight:1.65 }}>
-            <strong>Ly thuyet:</strong> {lab.theory}
+            <strong>Lý thuyết:</strong> {lab.theory}
           </div>
         </div>
       )}
@@ -139,7 +139,7 @@ function LabDetail({ lab, done, setDone, onBack }) {
       {tab === 'verify' && (
         <div>
           <div className="card" style={{ padding:'1.1rem', marginBottom:'.75rem' }}>
-            <div style={{ fontWeight:700, color:'var(--c)', marginBottom:'1rem' }}>Cau hoi kiem tra</div>
+            <div style={{ fontWeight:700, color:'var(--c)', marginBottom:'1rem' }}>Câu hỏi kiểm tra</div>
             {lab.verify?.map((v,i) => (
               <div key={i} style={{ background:'var(--bg)', borderRadius:8, padding:'.75rem .9rem', marginBottom:'.5rem', border:'1px solid var(--brd)' }}>
                 <div style={{ fontWeight:600, fontSize:'.84rem', color:'var(--txt)', marginBottom:'.38rem' }}>{i+1}. {v.q}</div>
@@ -151,8 +151,8 @@ function LabDetail({ lab, done, setDone, onBack }) {
             ))}
           </div>
           {done[lab.id]
-            ? <div className="alert as">Xuat sac! Da hoan thanh <strong>{lab.title}</strong></div>
-            : <div className="alert aw">Chua mark done. Quay lai tab Cac buoc.</div>
+            ? <div className="alert as">Xuất sắc ! Đã hoàn thành <strong>{lab.title}</strong></div>
+            : <div className="alert aw">Chưa mark done. Quay lại tab Các bước.</div>
           }
         </div>
       )}
@@ -191,7 +191,7 @@ export default function Labs() {
   const [grp,  setGrp]  = useState('all')
 
   if (!LABS || LABS.length === 0) {
-    return <div className="page-hdr"><h1>Labs chua co du lieu</h1></div>
+    return <div className="page-hdr"><h1>Labs chưa có dữ liệu</h1></div>
   }
 
   const list   = grp === 'all' ? LABS : LABS.filter(l => l.group === grp)
@@ -213,8 +213,8 @@ export default function Labs() {
     <div className="fu">
       {/* Header */}
       <div className="page-hdr">
-        <h1><span className="gt">Lab thuc hanh</span></h1>
-        <p>{LABS.length} labs — {total}/{LABS.length} hoan thanh</p>
+        <h1><span className="gt">Lab thực hành</span></h1>
+        <p>{LABS.length} labs — {total}/{LABS.length} Hoàn thành</p>
       </div>
 
       {/* Group filter */}
@@ -233,7 +233,7 @@ export default function Labs() {
 
       {/* Progress */}
       <div style={{ padding:'.6rem .9rem', background:'rgba(0,212,255,.04)', border:'1px solid rgba(0,212,255,.12)', borderRadius:8, marginBottom:'1.2rem', display:'flex', alignItems:'center', gap:'.8rem' }}>
-        <span style={{ fontSize:'.7rem', color:'var(--txt3)', fontFamily:'var(--fm)', flexShrink:0 }}>TIEN DO</span>
+        <span style={{ fontSize:'.7rem', color:'var(--txt3)', fontFamily:'var(--fm)', flexShrink:0 }}>TIẾN ĐỘ</span>
         <div className="prog" style={{ flex:1 }}><div className="prog-f" style={{ width:`${total/LABS.length*100}%` }}/></div>
         <span style={{ fontSize:'.72rem', color:'var(--c)', fontFamily:'var(--fm)', flexShrink:0 }}>{total}/{LABS.length}</span>
       </div>
