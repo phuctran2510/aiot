@@ -162,80 +162,100 @@ export default function App() {
 }
 const S = {
   wrap:{
-  height:'100vh',
-  display:'flex',
-  alignItems:'center',
-  justifyContent:'center',
-  background:'radial-gradient(circle at 20% 20%, #1d4ed8, transparent 40%), radial-gradient(circle at 80% 80%, #22c55e, transparent 40%), #020617'
-},
-  ccard:{
-  display:'grid',
-  gridTemplateColumns:'1fr 1fr',
-  width:900,
-  backdropFilter:'blur(20px)',
-  background:'rgba(15,23,42,0.6)',
-  border:'1px solid rgba(255,255,255,0.08)',
-  borderRadius:20,
-  overflow:'hidden',
-  color:'#fff',
-  boxShadow:'0 20px 60px rgba(0,0,0,0.6)'
-},
-logo:{
-  fontSize:'2.5rem',
-  fontWeight:900,
-  background:'linear-gradient(135deg,#22c55e,#3b82f6)',
-  WebkitBackgroundClip:'text',
-  WebkitTextFillColor:'transparent'
-},
+    height:'100vh',
+    display:'flex',
+    alignItems:'center',
+    justifyContent:'center',
+    background:`
+      radial-gradient(circle at 20% 20%, #1d4ed8, transparent 40%),
+      radial-gradient(circle at 80% 80%, #22c55e, transparent 40%),
+      #020617
+    `
+  },
+
+  card:{
+    display:'grid',
+    gridTemplateColumns:'1fr 1fr',
+    width:900,
+    backdropFilter:'blur(20px)',
+    background:'rgba(15,23,42,0.6)',
+    border:'1px solid rgba(255,255,255,0.08)',
+    borderRadius:20,
+    overflow:'hidden',
+    color:'#fff',
+    boxShadow:'0 20px 60px rgba(0,0,0,0.6)'
+  },
+
   left:{
-    padding:'2rem'
+    padding:'2.5rem'
   },
+
   right:{
-    padding:'2rem',
-    background:'#020617'
+    padding:'2.5rem',
+    background:'linear-gradient(180deg, rgba(2,6,23,0.7), rgba(2,6,23,1))'
   },
- 
-  title:{
-    marginTop:10
-  },
-  subtitle:{
-    fontSize:'.9rem',
-    color:'#94a3b8'
-  },
-  input:{
-  width:'100%',
-  padding:'14px',
-  marginTop:20,
-  marginBottom:12,
-  borderRadius:10,
-  border:'1px solid rgba(255,255,255,0.1)',
-  background:'rgba(255,255,255,0.05)',
-  color:'#fff',
-  outline:'none',
-  transition:'all .2s'
-},
 
-  btn:{
-  width:'100%',
-  padding:'14px',
-  borderRadius:10,
-  background:'linear-gradient(135deg,#22c55e,#4ade80)',
-  border:'none',
-  fontWeight:600,
-  cursor:'pointer',
-  transition:'all .25s'
-},
-
-  contactTitle:{
+  logo:{
+    fontSize:'2.5rem',
+    fontWeight:900,
+    background:'linear-gradient(135deg,#22c55e,#3b82f6)',
+    WebkitBackgroundClip:'text',
+    WebkitTextFillColor:'transparent',
     marginBottom:10
   },
-  info:{
-    lineHeight:1.8
-  },
-  note:{
+
+  title:{
     marginTop:10,
-    fontSize:'.8rem',
-    color:'#94a3b8'
+    fontSize:'1.6rem',
+    fontWeight:700
   },
-  
+
+  subtitle:{
+    fontSize:'.95rem',
+    color:'#94a3b8',
+    marginBottom:'1.5rem'
+  },
+
+  input:{
+    width:'100%',
+    padding:'14px',
+    marginTop:10,
+    marginBottom:14,
+    borderRadius:10,
+    border:'1px solid rgba(255,255,255,0.1)',
+    background:'rgba(255,255,255,0.05)',
+    color:'#fff',
+    outline:'none',
+    transition:'all .25s'
+  },
+
+  btn:{
+    width:'100%',
+    padding:'14px',
+    borderRadius:10,
+    background:'linear-gradient(135deg,#22c55e,#4ade80)',
+    border:'none',
+    fontWeight:600,
+    cursor:'pointer',
+    transition:'all .25s',
+    color:'#022c22'
+  },
+
+  contactTitle:{
+    marginBottom:12,
+    fontSize:'1.2rem',
+    color:'#22c55e',
+    fontWeight:600
+  },
+
+  info:{
+    lineHeight:1.9,
+    fontSize:'.95rem'
+  },
+
+  note:{
+    marginTop:15,
+    fontSize:'.85rem',
+    color:'#94a3b8'
+  }
 }
