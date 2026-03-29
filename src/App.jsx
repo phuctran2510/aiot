@@ -27,11 +27,62 @@ const NAV = [
     { to:'/contact',   label:'Liên hệ GV'  },
   ]},
 ]
+function Login({ onLogin }) {
+  const [pwd, setPwd] = useState('')
 
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    if (pwd === '123456') { // 👉 đổi mật khẩu ở đây
+      localStorage.setItem('auth', 'true')
+      onLogin(true)
+    } else {
+      alert('Sai mật khẩu')
+    }
+  }
+
+  return (
+    <div style={{
+      height: '100vh',
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      background: '#0f172a'
+    }}>
+      <form onSubmit={handleSubmit} style={{
+        background: '#111827',
+        padding: '2rem',
+        borderRadius: 10,
+        border: '1px solid #333'
+      }}>
+        <h2 style={{color:'#fff'}}>Login</h2>
+        <input
+          type="password"
+          placeholder="Nhập mật khẩu"
+          value={pwd}
+          onChange={e => setPwd(e.target.value)}
+          style={{padding:'.5rem',marginTop:'.5rem'}}
+        />
+        <br/>
+        <button style={{marginTop:'.8rem'}} type="submit">Vào</button>
+      </form>
+    </div>
+  )
+}
 export default function App() {
+  const [isAuth, setIsAuth] = useState(false)
+
+  useEffect(() => {
+    const saved = localStorage.getItem('auth')
+    if (saved === 'true') setIsAuth(true)
+  }, [])
+
   const [open, setOpen] = useState(false)
   const loc = useLocation()
   useEffect(() => { setOpen(false); window.scrollTo(0,0) }, [loc.pathname])
+
+  if (!isAuth) {
+  return <Login onLogin={setIsAuth} />
+}
 
   return (
     <div className="layout">
