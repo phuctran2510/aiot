@@ -32,7 +32,7 @@ function Login({ onLogin }) {
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    if (pwd === 'aiot2026') { // 👉 đổi mật khẩu ở đây
+    if (pwd === '123456') {
       localStorage.setItem('auth', 'true')
       onLogin(true)
     } else {
@@ -41,30 +41,49 @@ function Login({ onLogin }) {
   }
 
   return (
-    <div style={{
-      height: '100vh',
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      background: '#0f172a'
-    }}>
-      <form onSubmit={handleSubmit} style={{
-        background: '#111827',
-        padding: '2rem',
-        borderRadius: 10,
-        border: '1px solid #333'
-      }}>
-        <h2 style={{color:'#fff'}}>Login</h2>
-        <input
-          type="password"
-          placeholder="Nhập mật khẩu"
-          value={pwd}
-          onChange={e => setPwd(e.target.value)}
-          style={{padding:'.5rem',marginTop:'.5rem'}}
-        />
-        <br/>
-        <button style={{marginTop:'.8rem'}} type="submit">Vào</button>
-      </form>
+    <div style={S.wrap}>
+      <div style={S.card}>
+        {/* LEFT */}
+        <div style={S.left}>
+          <div style={S.logo}>AIoT</div>
+          <h2 style={S.title}>AIoT EDU</h2>
+          <p style={S.subtitle}>
+            Hệ thống học tập & nghiên cứu AIoT — DLU
+          </p>
+
+          <form onSubmit={handleSubmit} style={{width:'100%'}}>
+            <input
+              type="password"
+              placeholder="Nhập mật khẩu truy cập"
+              value={pwd}
+              onChange={e => setPwd(e.target.value)}
+              style={S.input}
+            />
+            <button style={S.btn}>Đăng nhập</button>
+          </form>
+        </div>
+
+        {/* RIGHT */}
+        <div style={S.right}>
+          <h3 style={S.contactTitle}>Liên hệ giảng viên</h3>
+
+          <div style={S.info}>
+            <div><strong>GV:</strong> Trần Vĩnh Phúc</div>
+            <div>
+              <strong>Email:</strong>{' '}
+              <a href="mailto:phuctv@dlu.edu.vn">phuctv@dlu.edu.vn</a>
+            </div>
+            <div>
+              <strong>SĐT:</strong>{' '}
+              <a href="tel:0976353605">0976353605</a>
+            </div>
+          </div>
+
+          <p style={S.note}>
+            Vui lòng liên hệ nếu bạn cần cấp quyền truy cập hệ thống.
+          </p>
+        </div>
+      </div>
     </div>
   )
 }
