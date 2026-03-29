@@ -48,7 +48,7 @@ function LabDetail({ lab, done, setDone, onBack }) {
             className={`btn ${done[lab.id] ? 'btn-s' : 'btn-p'}`}
             style={{ flexShrink:0, marginTop:'.2rem' }}
             onClick={() => setDone(p => ({ ...p, [lab.id]: !p[lab.id] }))}>
-            {done[lab.id] ? 'Da xong' : 'Mark done'}
+            {done[lab.id] ? 'Đã xong' : 'Mark done'}
           </button>
         </div>
         {/* Progress */}
