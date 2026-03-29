@@ -3,7 +3,7 @@ import { QUIZ } from '../data/content'
 
 const CATS = ['all', ...new Set(QUIZ.map(q => q.cat))]
 const LVS  = ['all', 'easy', 'medium', 'hard']
-const LVL  = { easy:'Co ban', medium:'Trung cap', hard:'Nang cao' }
+const LVL  = { easy:'Cơ Bản', medium:'Trung Cấp', hard:'Nâng cao' }
 
 export default function Quiz() {
   const [cat, setCat] = useState('all')
@@ -71,25 +71,25 @@ export default function Quiz() {
     )
   }
 
-  if (!q) return <div className="page-hdr"><h1>Khong co cau hoi nao</h1></div>
+  if (!q) return <div className="page-hdr"><h1>Không có câu hỏi nào</h1></div>
 
   return (
     <div className="fu">
       <div className="page-hdr">
-        <h1><span className="gt">Trac nghiem AIoT</span></h1>
-        <p>{QUIZ.length} cau hoi — 6 chu de — co giai thich chi tiet</p>
+        <h1><span className="gt">Trắc Nghiệm AIoT</span></h1>
+        <p>{QUIZ.length} Câu hỏi — 6 Chủ Đề — Có Giải Thích Chi Tiết</p>
       </div>
 
       <div style={{display:'flex',gap:'.45rem',flexWrap:'wrap',marginBottom:'1rem',alignItems:'center'}}>
         <select value={cat} onChange={e => { setCat(e.target.value); setIdx(0); setCh({}) }}
           style={{padding:'.38rem .65rem',background:'var(--sur)',border:'1px solid var(--brd)',color:'var(--txt)',borderRadius:6,fontSize:'.81rem',fontFamily:'var(--fd)',cursor:'pointer'}}>
-          {CATS.map(c => <option key={c} value={c}>{c==='all'?`Tat ca (${QUIZ.length})`:c}</option>)}
+          {CATS.map(c => <option key={c} value={c}>{c==='all'?`Tất cả (${QUIZ.length})`:c}</option>)}
         </select>
         <select value={lv} onChange={e => { setLv(e.target.value); setIdx(0); setCh({}) }}
           style={{padding:'.38rem .65rem',background:'var(--sur)',border:'1px solid var(--brd)',color:'var(--txt)',borderRadius:6,fontSize:'.81rem',fontFamily:'var(--fd)',cursor:'pointer'}}>
-          {LVS.map(l => <option key={l} value={l}>{l==='all'?'Tat ca cap do':LVL[l]}</option>)}
+          {LVS.map(l => <option key={l} value={l}>{l==='all'?'Tất cả cấp độ':LVL[l]}</option>)}
         </select>
-        <button className="btn btn-p" onClick={() => { setCh({}); setScore(null); setMode('test') }}>Bat dau kiem tra ({pool.length})</button>
+        <button className="btn btn-p" onClick={() => { setCh({}); setScore(null); setMode('test') }}>Bắt đầu kiểm tra ({pool.length})</button>
       </div>
 
       <div style={{fontSize:'.74rem',color:'var(--txt3)',marginBottom:'.65rem'}}>Cau {idx+1}/{pool.length} · {q.cat} · {LVL[q.lv]||q.lv}</div>
@@ -109,13 +109,13 @@ export default function Quiz() {
           )
         })}
         {ch[idx] !== undefined && (
-          <div className="alert as" style={{marginTop:'.7rem',fontSize:'.83rem'}}><strong>Giai thich:</strong> {q.exp}</div>
+          <div className="alert as" style={{marginTop:'.7rem',fontSize:'.83rem'}}><strong>Giải thích:</strong> {q.exp}</div>
         )}
       </div>
 
       <div style={{display:'flex',justifyContent:'space-between',gap:'.5rem'}}>
-        <button className="btn btn-s" disabled={idx===0} onClick={() => setIdx(i => i-1)}>Cau truoc</button>
-        <button className="btn btn-o" disabled={idx===pool.length-1} onClick={() => setIdx(i => i+1)}>Cau tiep</button>
+        <button className="btn btn-s" disabled={idx===0} onClick={() => setIdx(i => i-1)}>Câu trước</button>
+        <button className="btn btn-o" disabled={idx===pool.length-1} onClick={() => setIdx(i => i+1)}>Câu tiếp</button>
       </div>
     </div>
   )

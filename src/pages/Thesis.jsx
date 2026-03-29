@@ -49,7 +49,7 @@ export default function Thesis() {
     <div className="fu">
       <div className="page-hdr">
         <h1><span className="gt">Đề tài NCKH</span></h1>
-        <p>{THESIS.length} ĐỀ tài từ cơ bản đến nâng cao và khởi nghiệp dành cho SV</p>
+        <p>{THESIS.length} Đề tài từ cơ bản đến nâng cao và khởi nghiệp dành cho SV</p>
       </div>
 
       <div className="tabs" style={{marginBottom:'1rem'}}>
