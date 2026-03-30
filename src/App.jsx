@@ -34,7 +34,7 @@ function Login({ onLogin }) {
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    if (pwd === 'sdn2026') {
+    if (pwd === 'aiot2026') {
       localStorage.setItem('auth', 'true')
       onLogin(true)
     } else {
@@ -53,12 +53,12 @@ function Login({ onLogin }) {
       <div style={S.card}>
         {/* Left — branding */}
         <div style={S.left}>
-          <div style={S.badge}>SDN · CNTT · DLU</div>
+          <div style={S.badge}>AIoT · CNTT · DLU</div>
           <div style={S.logo}>
-            <span style={S.logoAccent}>SDN</span>
+            <span style={S.logoAccent}>AIoT</span>
             <span style={S.logoMain}>EDU</span>
           </div>
-          <p style={S.tagline}>Hệ thống học tập & nghiên cứu<br/>Software Defined Networking</p>
+          <p style={S.tagline}>Hệ thống học tập & nghiên cứu<br/>AIoT (Artificial Intelligence of Things) </p>
           <div style={S.divider}/>
           <div style={S.meta}>
             <div style={S.metaRow}><span style={S.metaDot}/> GV: Trần Vĩnh Phúc</div>
